@@ -55,3 +55,6 @@ target/
 
 # Profiler
 *.py.lprof
+
+# Project specific
+.duplicates.json.gz

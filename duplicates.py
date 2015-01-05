@@ -1,12 +1,25 @@
 #!/usr/bin/env python2
+"""Usage: duplicates.py [options] DIRECTORY
+
+Options:
+    --first_n N         stop after N files [default: inf]
+    --clean             remove deleted file from the index  # TODO
+    --progress          show the progress  # TODO
+    --dry-run           display the pathnames  # TODO
+    --find-file         find duplicates of a given file  # TODO
+    --list              list all files in the given directory  # TODO
+"""
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import os
 
 from data_store import FileStore, FILESTORE
+from docopt import docopt
 from file_attr import FileAttrFactory
 from utils import absolute_path
+from schema import And, Optional, Or, Schema, SchemaError, Use
+
 
 WHITELISTED_EXTENTIONS = ['.gif', '.jpeg', '.jpg', '.png']
 
@@ -15,7 +28,7 @@ class Duplicates():
 
     def __init__(self, args, store):
         self._show_progress = self._pass
-        self._first_n = float(args['first_n'])
+        self._first_n = float(args['--first_n'])
         self.directory = absolute_path(args['DIRECTORY'])
         self.store = store
         self._pathname_sha_cache = {}
@@ -70,14 +83,36 @@ class Duplicates():
 
 
 def main(args):
+    args = validate_args(args)
+    store = FileStore(args)
+    duplicates = Duplicates(args, store)
+
     try:
-        store = FileStore(args)
-        duplicates = Duplicates(args, store)
         duplicates.collect_data()
     except KeyboardInterrupt:
         store.save()
     else:
         store.save()
 
+
+def validate_args(args):
+    schema = Schema({
+        'DIRECTORY': And(os.path.exists, error="DIRECTORY does not exists"),
+        '--first_n': Or(u'inf', And(Use(int)),
+                        error="--first_n=N should be integer"),
+        Optional('--clean'): bool,
+        Optional('--progress'): bool,
+        Optional('--dry-run'): bool,
+        Optional('--find-file'): bool,
+        Optional('--list'): bool
+    })
+    try:
+        args = schema.validate(args)
+    except SchemaError as e:
+        exit(e)
+    return args
+
 if __name__ == '__main__':
-    main({'DIRECTORY': '.', 'first_n': 'inf'})
+    args = docopt(__doc__, argv=None, help=True,
+                  version=None, options_first=False)
+    main(args)

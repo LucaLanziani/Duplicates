@@ -32,3 +32,6 @@ class FileAttrTest(unittest.TestCase):
 
     def hash_test(self):
         assert self.file_attr.hash == MD5
+
+    def size_test(self):
+        assert self.file_attr.size == 0

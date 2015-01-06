@@ -13,5 +13,5 @@ UPDATE_ENV: CHECK_ENV requirements.txt
 	pip install --upgrade pip
 	pip install -r requirements.txt
 
-TEST: CHECK_ENV
+TESTS: CHECK_ENV
 	nosetests

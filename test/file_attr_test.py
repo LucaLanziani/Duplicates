@@ -4,7 +4,7 @@ from __future__ import (absolute_import, division, print_function,
 import unittest
 
 from file_attr import FileAttr, FileNotFoundError
-from nose.tools import raises
+from nose.tools import raises, eq_
 
 TEST_FILE = './test/empty_file.test'
 MD5 = 'd41d8cd98f00b204e9800998ecf8427e'
@@ -22,16 +22,16 @@ class FileAttrTest(unittest.TestCase):
         FileAttr(TEST_FILE.replace('test', 'notExists'))
 
     def md5_test(self):
-        assert self.file_attr.md5 == MD5
+        eq_(self.file_attr.md5, MD5)
 
     def sha1_test(self):
-        assert self.file_attr.sha1 == SHA1
+        eq_(self.file_attr.sha1, SHA1)
 
     def sha256_test(self):
-        assert self.file_attr.sha256 == SHA256
+        eq_(self.file_attr.sha256, SHA256)
 
     def hash_test(self):
-        assert self.file_attr.hash == MD5
+        eq_(self.file_attr.hash, MD5)
 
     def size_test(self):
-        assert self.file_attr.size == 0
+        eq_(self.file_attr.size, 0)

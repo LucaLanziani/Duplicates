@@ -20,3 +20,15 @@ class FileAttrTest(unittest.TestCase):
     @raises(FileNotFoundError)
     def raise_if_file_not_exist_test(self):
         FileAttr(TEST_FILE.replace('test', 'notExists'))
+
+    def md5_test(self):
+        assert self.file_attr.md5 == MD5
+
+    def sha1_test(self):
+        assert self.file_attr.sha1 == SHA1
+
+    def sha256_test(self):
+        assert self.file_attr.sha256 == SHA256
+
+    def hash_test(self):
+        assert self.file_attr.hash == MD5

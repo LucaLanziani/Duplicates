@@ -5,9 +5,13 @@ import os
 import hashlib
 import stat
 
-from utils import absolute_path, FileNotFoundError
+from utils import absolute_path
 
 BLOCKSIZE = 65536
+
+
+class FileNotFoundError(Exception):
+    pass
 
 
 def cache_result(func):

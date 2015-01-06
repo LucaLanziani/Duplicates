@@ -4,10 +4,6 @@ from __future__ import (absolute_import, division, print_function,
 import os
 
 
-class FileNotFoundError(Exception):
-    pass
-
-
 def absolute_path(directory):
     directory = os.path.expanduser(directory)
     directory = os.path.expandvars(directory)

@@ -16,12 +16,12 @@ class FileNotFoundError(Exception):
 
 def cache_result(func):
     def _decorator(self, *args, **kwargs):
-        key = "_%s_%s" % (func.__name__, 'cached_result')
+        key = func.__name__
         try:
-            return getattr(self, key)
-        except AttributeError:
-            setattr(self, key, func(self, *args, **kwargs))
-            return getattr(self, key)
+            return self._cached[key]
+        except KeyError:
+            self._cached[key] = func(self, *args, **kwargs)
+            return self._cached[key]
     return _decorator
 
 
@@ -32,6 +32,7 @@ class FileAttr(object):
         self.abs_pathname = absolute_path(pathname)
         if not os.path.exists(self.abs_pathname):
             raise FileNotFoundError(pathname)
+        self._cached = {}
 
     def extention(self):
         return os.path.splitext(self.abs_pathname)[1].lower()

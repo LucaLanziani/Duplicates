@@ -29,17 +29,17 @@ class FileAttr(object):
     """Return the file data"""
     def __init__(self, pathname):
         super(FileAttr, self).__init__()
-        self.abs_pathname = absolute_path(pathname)
-        if not os.path.exists(self.abs_pathname):
+        self._abs_pathname = absolute_path(pathname)
+        if not os.path.exists(self._abs_pathname):
             raise FileNotFoundError(pathname)
         self._cached = {}
 
     def extention(self):
-        return os.path.splitext(self.abs_pathname)[1].lower()
+        return os.path.splitext(self._abs_pathname)[1].lower()
 
     def _hash(self, hash_function=hashlib.md5):
         filehash = hash_function()
-        with open(self.abs_pathname, 'rb') as fp:
+        with open(self._abs_pathname, 'rb') as fp:
             buf = fp.read(BLOCKSIZE)
             while len(buf) > 0:
                 filehash.update(buf)
@@ -49,6 +49,10 @@ class FileAttr(object):
     @property
     def hash(self):
         return self.md5
+
+    @property
+    def pathname(self):
+        return self._abs_pathname
 
     @property
     @cache_result
@@ -66,15 +70,17 @@ class FileAttr(object):
         return self._hash(hash_function=hashlib.md5)
 
     @property
+    @cache_result
+    def pathname_hash(self):
+        return FileAttr.hash_pathname(self._abs_pathname)
+
+    @property
     def size(self):
-        return os.stat(self.abs_pathname)[stat.ST_SIZE]
+        return os.stat(self._abs_pathname)[stat.ST_SIZE]
 
     @property
     def lmtime(self):
-        return os.stat(self.abs_pathname)[stat.ST_MTIME]
-
-    def similar(self, other):
-        return (self.size == other.size and self.lmtime == other.lmtime)
+        return os.stat(self._abs_pathname)[stat.ST_MTIME]
 
     @staticmethod
     def hash_pathname(pathname):

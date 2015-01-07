@@ -55,7 +55,7 @@ class FileStore(object):
         """
         Return the file data relative to the data ` directory
         """
-        rel_pathname = self._rel_path(file_attr.abs_pathname)
+        rel_pathname = self._rel_path(file_attr.pathname)
         rel_pathname_hash = FileAttr.hash_pathname(rel_pathname)
         return rel_pathname, rel_pathname_hash
 

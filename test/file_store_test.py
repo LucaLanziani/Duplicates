@@ -10,7 +10,14 @@ from file_attr import FileAttr
 from nose.tools import eq_
 
 TEST_DIR = './test'
-TEST_FILE = './test/empty_file.test'
+TEST_FILE = './test/empty file.exe.test'
+FILE_STORE_PATH = os.path.join(os.path.abspath(TEST_DIR), FILESTORE)
+STORE_CONTENT = ('H4sICFhjrFQC/y5kdXBsaWNhdGVzLmpzb24ArZFNbsMgEIX3OYXFukoHDB7o'
+                 'VarI4meQrcZOFJCi\nNPLda5PGSptFN2WF5r153zBcN9V82Md4OI/t0eZutA'
+                 'Ml9la9F6GI6BHRO86Dd6aOFB26mngw6DwE\nJxpbeycwEnjAhigalNIr5RUq'
+                 'q+uGlajdS3VjrZTW5nyaUdd/RD2mlcT9kPuB5jqXApTmyojvQVbL\nfaDZxL'
+                 'avNBzzpY39nraZUma/3Z1N3eIMkgftg9ERwAmQZDSAMZp81FIgPTWm/nNBwF'
+                 'qdym2672UJ\nbvOhoNPPtfzJevyv0vH8jlXf3bCb6QtNxfd8/AEAAA==\n')
 
 
 class FileStoreTest(unittest.TestCase):
@@ -21,7 +28,7 @@ class FileStoreTest(unittest.TestCase):
 
     def tearDown(self):
         try:
-            os.remove(os.path.join(os.path.abspath(TEST_DIR), FILESTORE))
+            os.remove(FILE_STORE_PATH)
         except OSError:
             pass
 
@@ -48,4 +55,7 @@ class FileStoreTest(unittest.TestCase):
         assert os.path.isfile(self.store.store_path)
 
     def load_test(self):
-        pass
+        with open(FILE_STORE_PATH, 'wb') as fp:
+            fp.write(STORE_CONTENT.decode('base64'))
+        self.store.load()
+        eq_(True, self.store.is_file_known(self.file_attr))

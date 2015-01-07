@@ -113,10 +113,10 @@ class FileAttrFactory(object):
 
     @classmethod
     def by_pathname(cls, pathname):
-        pathname = absolute_path(pathname)
+        abs_pathname = absolute_path(pathname)
         store = cls.filesAttr
-        file_attr = FileAttr(pathname)
-        key = FileAttr.hash_pathname(pathname)
+        file_attr = FileAttr(abs_pathname)
+        key = FileAttr.pathname_hash
         if (key not in store or not store[key].similar(file_attr)):
             cls.filesAttr[key] = file_attr
 

@@ -71,28 +71,24 @@ class Duplicates():
             if not recursive:
                 break
 
-    def list(self):
-        for pathname in self.dir_content():
-            file_obj = FileAttrFactory.by_pathname(pathname)
-            print(file_obj.pathname)
-
     def collect_data(self):
         for pathname in self.dir_content():
             self.store.add_file(FileAttrFactory.by_pathname(pathname))
             self._show_progress()
 
+    def run(self):
+        try:
+            self.collect_data()
+        except KeyboardInterrupt:
+            self.store.save()
+        else:
+            self.store.save()
+
 
 def main(args):
     args = validate_args(args)
     store = FileStore(args)
-    duplicates = Duplicates(args, store)
-
-    try:
-        duplicates.collect_data()
-    except KeyboardInterrupt:
-        store.save()
-    else:
-        store.save()
+    Duplicates(args, store).run()
 
 
 def validate_args(args):

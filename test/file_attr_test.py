@@ -3,7 +3,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import unittest
 
-from file_attr import FileAttr, FileNotFoundError
+from file_attr import FileAttr, FileNotFoundError, FileAttrFactory
 from nose.tools import raises, eq_
 
 TEST_FILE = './test/empty file.exe.test'
@@ -41,3 +41,14 @@ class FileAttrTest(unittest.TestCase):
 
     def extention_test(self):
         eq_(self.file_attr.extention, '.test')
+
+    def similarity_test(self):
+        eq_(self.file_attr.similar(self.file_attr), True)
+
+
+class FileAttrFactoryTest(unittest.TestCase):
+
+    def by_pathname_test(self):
+        first = FileAttrFactory.by_pathname(TEST_FILE)
+        second = FileAttrFactory.by_pathname(TEST_FILE)
+        eq_(first, second)

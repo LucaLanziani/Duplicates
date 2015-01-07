@@ -95,6 +95,13 @@ class FileAttr(object):
     def hash_pathname(pathname):
         return hashlib.sha256(pathname).hexdigest()
 
+    def similar(self, other):
+        return (
+            self.extention == other.extention and
+            self.size == other.size and
+            self.lmtime == other.lmtime
+        )
+
 
 class FileAttrFactory(object):
     """Generate FileAttr object"""

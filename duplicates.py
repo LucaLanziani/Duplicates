@@ -30,7 +30,7 @@ class Duplicates():
         self._show_progress = self._pass
         self._first_n = float(args['--first_n'])
         self.directory = absolute_path(args['DIRECTORY'])
-        self.store = store
+        self._store = FileStore(self.directory)
         self._pathname_sha_cache = {}
 
     def _pass(self):
@@ -73,22 +73,21 @@ class Duplicates():
 
     def collect_data(self):
         for pathname in self.dir_content():
-            self.store.add_file(FileAttrFactory.by_pathname(pathname))
+            self._store.add_file(FileAttrFactory.by_pathname(pathname))
             self._show_progress()
 
     def run(self):
         try:
             self.collect_data()
         except KeyboardInterrupt:
-            self.store.save()
+            self._store.save()
         else:
-            self.store.save()
+            self._store.save()
 
 
 def main(args):
     args = validate_args(args)
-    store = FileStore(args)
-    Duplicates(args, store).run()
+    Duplicates(args).run()
 
 
 def validate_args(args):

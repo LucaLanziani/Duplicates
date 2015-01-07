@@ -23,9 +23,9 @@ DEFAULT_DATA = {
 
 class FileStore(object):
     """store information about duplicates"""
-    def __init__(self, args):
+    def __init__(self, directory):
         super(FileStore, self).__init__()
-        self.base_dir = absolute_path(args['DIRECTORY'])
+        self.base_dir = absolute_path(directory)
         self.store_path = os.path.join(self.base_dir, FILESTORE)
         self.load()
         self.known_pathnames = self.data[KNOWN_PATHNAMES]

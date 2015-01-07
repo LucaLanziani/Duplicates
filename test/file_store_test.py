@@ -23,7 +23,7 @@ STORE_CONTENT = ('H4sICFhjrFQC/y5kdXBsaWNhdGVzLmpzb24ArZFNbsMgEIX3OYXFukoHDB7o'
 class FileStoreTest(unittest.TestCase):
 
     def setUp(self):
-        self.store = FileStore({'DIRECTORY': TEST_DIR})
+        self.store = FileStore(TEST_DIR)
         self.file_attr = FileAttr(TEST_FILE)
 
     def tearDown(self):

@@ -103,3 +103,8 @@ class FileStore(object):
         stored_data = self.pathnames_attr[rel_pathname_hash]
         self.hash_to_files[stored_data['hash']].remove(stored_data['pathname'])
         del(self.pathnames_attr[rel_pathname_hash])
+
+    def duplicates(self):
+        for _, paths in self.hash_to_files.iteritems():
+            if len(paths) > 1:
+                yield map(lambda path: absolute_path(path), paths)

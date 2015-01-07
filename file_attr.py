@@ -34,9 +34,6 @@ class FileAttr(object):
             raise FileNotFoundError(pathname)
         self._cached = {}
 
-    def extention(self):
-        return os.path.splitext(self._abs_pathname)[1].lower()
-
     def _hash(self, hash_function=hashlib.md5):
         filehash = hash_function()
         with open(self._abs_pathname, 'rb') as fp:
@@ -47,12 +44,24 @@ class FileAttr(object):
         return filehash.hexdigest()
 
     @property
-    def hash(self):
-        return self.md5
-
-    @property
     def pathname(self):
         return self._abs_pathname
+
+    @property
+    def directory(self):
+        return os.path.dirname(self._abs_pathname)
+
+    @property
+    def filename(self):
+        return os.path.basename(self._abs_pathname)
+
+    @property
+    def extention(self):
+        return os.path.splitext(self._abs_pathname)[1].lower()
+
+    @property
+    def hash(self):
+        return self.md5
 
     @property
     @cache_result

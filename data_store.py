@@ -5,9 +5,10 @@ import gzip
 import json
 import os
 from collections import defaultdict
+from datetime import datetime
 
 from file_attr import FileAttr
-from utils import absolute_path
+from utils import absolute_path, serialize_date, deserialize_date, epoch
 
 FILESTORE = ".duplicates.json"
 FILESTORE = ".duplicates.json.gz"
@@ -41,6 +42,7 @@ class FileStore(object):
                 KNOWN_PATHNAMES: [],
                 PATHNAMES_ATTR: {},
                 HASH_TO_FILES: {},
+                LAST_UPDATE: serialize_date(epoch)
             }
 
     def _to_json(self):
@@ -98,14 +100,22 @@ class FileStore(object):
     def hash_to_files(self):
         return self._data[HASH_TO_FILES]
 
+    @property
+    def last_update(self):
+        return self._data[LAST_UPDATE]
+
     def load(self):
         data = self._from_json()
         data[HASH_TO_FILES] = defaultdict(list, data[HASH_TO_FILES])
         data[KNOWN_PATHNAMES] = set(data[KNOWN_PATHNAMES])
+        if LAST_UPDATE not in data:
+            data[LAST_UPDATE] = serialize_date(epoch)
+        data[LAST_UPDATE] = deserialize_date(data[LAST_UPDATE])
         self._data = data
 
     def save(self):
         self._data[KNOWN_PATHNAMES] = list(self.known_pathnames)
+        self._data[LAST_UPDATE] = serialize_date(datetime.utcnow())
         self._to_json()
 
     def remove_pathname(self, pathname):

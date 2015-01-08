@@ -9,6 +9,8 @@ from data_store import FileStore, FILESTORE
 from file_attr import FileAttr
 from nose.tools import eq_
 
+from utils import epoch, deserialize_date
+
 TEST_DIR = './test'
 TEST_FILE = './test/empty file.exe.test'
 FILE_STORE_PATH = os.path.join(os.path.abspath(TEST_DIR), FILESTORE)
@@ -20,6 +22,7 @@ STORE_CONTENT = (
  'AkVQXtxSN4S3zB+OVNArFYHGkH9ntHZsZ7QD7rBxBj1je8GADDJmDFLjEYSmH8Tx8D7bsLU7pWpa'
  'bvM8OBvIzdoiLr1lfMvwjkMleSVVwUuhBdwvsilHHU71nHb8esk/o11/cWL8vvqK2V2SbqYPKq7m'
  'ezMCAAA=')  # noqa
+STORE_LAST_UPDATE = '2015-01-08T14:31:35.162724Z'
 
 
 class FileStoreTest(unittest.TestCase):
@@ -38,7 +41,6 @@ class FileStoreTest(unittest.TestCase):
         eq_(self.store.base_dir, os.path.dirname(__file__))
 
     def store_path_will_be_in_cwd_test(self):
-        print(os.path.abspath(TEST_DIR))
         expected_path = os.path.join(os.path.abspath(TEST_DIR), FILESTORE)
         eq_(expected_path, self.store.store_path)
 
@@ -56,8 +58,17 @@ class FileStoreTest(unittest.TestCase):
         self.store.save()
         assert os.path.isfile(self.store.store_path)
 
-    def load_test(self):
+    def _write_store(self):
         with open(FILE_STORE_PATH, 'wb') as fp:
             fp.write(STORE_CONTENT.decode('base64'))
+
+    def load_test(self):
+        self._write_store()
         self.store.load()
         eq_(True, self.store.is_file_known(self.file_attr))
+
+    def last_update_test(self):
+        eq_(self.store.last_update, epoch)
+        self._write_store()
+        self.store.load()
+        eq_(self.store.last_update, deserialize_date(STORE_LAST_UPDATE))

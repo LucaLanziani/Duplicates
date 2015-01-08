@@ -2,6 +2,10 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import os
+from datetime import datetime
+
+EPOCH = (1970, 1, 1)
+DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 
 def absolute_path(directory):
@@ -17,6 +21,17 @@ def print_file_content():
         while len(content) > 0:
             print("%x %s", content, type(content))
             content = fd.read(1)
+
+
+def serialize_date(date):
+    return date.strftime(DATE_FORMAT)
+
+
+def deserialize_date(str_date):
+    return datetime.strptime(str_date, DATE_FORMAT)
+
+
+epoch = datetime(*EPOCH)
 
 
 if __name__ == '__main__':

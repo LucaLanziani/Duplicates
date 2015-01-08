@@ -26,7 +26,7 @@ WHITELISTED_EXTENTIONS = ['.gif', '.jpeg', '.jpg', '.png']
 
 class Duplicates():
 
-    def __init__(self, args, store):
+    def __init__(self, args):
         self._show_progress = self._pass
         self._first_n = float(args['--first_n'])
         self.directory = absolute_path(args['DIRECTORY'])

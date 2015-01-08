@@ -3,6 +3,9 @@
 ENV: Makefile
 	virtualenv --distribute ./env
 
+PYPY_ENV:
+	virtualenv -p /usr/bin/pypy --distribute ./pypy_env
+
 CHECK_ENV:
 ifndef VIRTUAL_ENV
 	$(error PLEASE ENTER THE VIRTUALENV BEFORE FUN THE COMMAND)

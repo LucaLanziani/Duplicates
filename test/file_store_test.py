@@ -12,12 +12,14 @@ from nose.tools import eq_
 TEST_DIR = './test'
 TEST_FILE = './test/empty file.exe.test'
 FILE_STORE_PATH = os.path.join(os.path.abspath(TEST_DIR), FILESTORE)
-STORE_CONTENT = ('H4sICFhjrFQC/y5kdXBsaWNhdGVzLmpzb24ArZFNbsMgEIX3OYXFukoHDB7o'
-                 'VarI4meQrcZOFJCi\nNPLda5PGSptFN2WF5r153zBcN9V82Md4OI/t0eZutA'
-                 'Ml9la9F6GI6BHRO86Dd6aOFB26mngw6DwE\nJxpbeycwEnjAhigalNIr5RUq'
-                 'q+uGlajdS3VjrZTW5nyaUdd/RD2mlcT9kPuB5jqXApTmyojvQVbL\nfaDZxL'
-                 'avNBzzpY39nraZUma/3Z1N3eIMkgftg9ERwAmQZDSAMZp81FIgPTWm/nNBwF'
-                 'qdym2672UJ\nbvOhoNPPtfzJevyv0vH8jlXf3bCb6QtNxfd8/AEAAA==\n')
+
+STORE_CONTENT = (
+ 'H4sICMeUrlQC/y5kdXBsaWNhdGVzLmpzb24ArVHJboMwEL3nKxDnhnoZ4zHf0VOrCDl4LKIGgoqr'
+ 'LhH/XuMUlC5SL/VpNPO2GZ83WXz5Y3966evBhra3HY15lT2kQRrK0ltP3CvPSq1MA4CSATKuuNLY'
+ 'oFQorW+M9HrvFAESeBPBznCw2os8Se1usovX6lLbEJ6i1fkfra7VkuKxC4eOYp+DYAq5MuIzyApZ'
+ 'AkVQXtxSN4S3zB+OVNArFYHGkH9ntHZsZ7QD7rBxBj1je8GADDJmDFLjEYSmH8Tx8D7bsLU7pWpa'
+ 'bvM8OBvIzdoiLr1lfMvwjkMleSVVwUuhBdwvsilHHU71nHb8esk/o11/cWL8vvqK2V2SbqYPKq7m'
+ 'ezMCAAA=')  # noqa
 
 
 class FileStoreTest(unittest.TestCase):

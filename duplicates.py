@@ -13,6 +13,7 @@ Options:
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import signal
 import os
 
 from data_store import FileStore, FILESTORE
@@ -39,6 +40,19 @@ class Duplicates():
 
     def _pass(self):
         pass
+
+    def _print_state(self, signum, stack):
+        analized = len(self._store.known_pathnames)
+        print(
+            'Added %s/%s (%.2f%%) files' % (
+                analized,
+                self._total_files,
+                100/(self._total_files/analized)
+            )
+        )
+
+    def _file_number(self):
+        self._total_files = len(list(self.dir_content()))
 
     def dir_content(self, recursive=True):
         """
@@ -81,12 +95,15 @@ class Duplicates():
             self._show_progress()
 
     def run(self):
+        self._file_number()
+        signal.signal(signal.SIGUSR1, self._print_state)
         try:
             self.collect_data()
         except KeyboardInterrupt:
             self._store.save()
         else:
             self._store.save()
+            print("Saving the result")
 
 
 def main(opt):

@@ -11,18 +11,18 @@ from nose.tools import eq_
 
 from utils import epoch, deserialize_date
 
-TEST_DIR = './test'
-TEST_FILE = './test/empty file.exe.test'
+TEST_DIR = './test/files/'
+TEST_FILE = './test/files/empty file.exe.test'
 FILE_STORE_PATH = os.path.join(os.path.abspath(TEST_DIR), FILESTORE)
 
 STORE_CONTENT = (
- 'H4sICMeUrlQC/y5kdXBsaWNhdGVzLmpzb24ArVHJboMwEL3nKxDnhnoZ4zHf0VOrCDl4LKIGgoqr'
- 'LhH/XuMUlC5SL/VpNPO2GZ83WXz5Y3966evBhra3HY15lT2kQRrK0ltP3CvPSq1MA4CSATKuuNLY'
- 'oFQorW+M9HrvFAESeBPBznCw2os8Se1usovX6lLbEJ6i1fkfra7VkuKxC4eOYp+DYAq5MuIzyApZ'
- 'AkVQXtxSN4S3zB+OVNArFYHGkH9ntHZsZ7QD7rBxBj1je8GADDJmDFLjEYSmH8Tx8D7bsLU7pWpa'
- 'bvM8OBvIzdoiLr1lfMvwjkMleSVVwUuhBdwvsilHHU71nHb8esk/o11/cWL8vvqK2V2SbqYPKq7m'
- 'ezMCAAA=')  # noqa
-STORE_LAST_UPDATE = '2015-01-08T14:31:35.162724Z'
+ 'H4sICCQgsFQC/y5kdXBsaWNhdGVzLmpzb24ArVHJboMwEL3nKxDnho63MOY7emoVIQePBWogqHbV'
+ 'JeLfa5yC0kXqpT6NZt424/Mmiy9/HE4vQz2a0A6mJ59X2UMapKHYOeOIOeVgVyrdSIkCJAJTTJXY'
+ 'oFAojGu0cOXBKpJI0ukItppJUzqeJ6n9TXbxWl1qE8JTtDr/o9W1WlI89qHrKfaZ5IAcQarPICtk'
+ 'CRRBeXFL/RjeMtcdqaBXKgL5kH9ntMa3M9pKZrGxGh3AgYMkjQBaIzUOJS/pB9F377MNrN0pVdNy'
+ 'm+fRmkB21uZx6S2wLeg7hpXAimOByECo+0U25ajDqZ7T+q+X/DPa9Rcnxu+rr5j9Jelm+gCc8H0m'
+ 'MwIAAA==')  # noqa
+STORE_LAST_UPDATE = '2015-01-09T18:38:28.881035Z'
 
 
 class FileStoreTest(unittest.TestCase):
@@ -36,9 +36,6 @@ class FileStoreTest(unittest.TestCase):
             os.remove(FILE_STORE_PATH)
         except OSError:
             pass
-
-    def have_the_cwd_as_base_dir_test(self):
-        eq_(self.store.base_dir, os.path.dirname(__file__))
 
     def store_path_will_be_in_cwd_test(self):
         expected_path = os.path.join(os.path.abspath(TEST_DIR), FILESTORE)

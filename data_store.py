@@ -25,7 +25,12 @@ LAST_UPDATE = 'updated'
 
 
 class FileStore(object):
-    """store information about duplicates"""
+    """store information about duplicates
+
+    The data are kept in a gziped json file inside the analized directory,
+    all the pathnames in the filestore are "local", by "local" we intend a
+    relative pathname from the filestore location.
+    """
     def __init__(self, directory):
         super(FileStore, self).__init__()
         self.base_dir = absolute_path(directory)
@@ -50,42 +55,39 @@ class FileStore(object):
         with gzip.open(self.store_path, 'wb') as fd:
             json.dump(self._data, fd, indent=4)
 
-    def _rel_path(self, pathname):
-        if not os.path.isabs(pathname):
-            pathname = absolute_path(pathname)
-        return pathname.replace(self.base_dir, '.')
+    def _local_path(self, abs_pathname):
+        return abs_pathname.replace(self.base_dir, '.')
 
-    def _relative_data(self, file_attr):
-        rel_pathname = self._rel_path(file_attr.pathname)
-        rel_pathname_hash = FileAttr.hash_pathname(rel_pathname)
-        return rel_pathname, rel_pathname_hash
+    def _local_data(self, file_attr):
+        local_pathname = self._local_path(file_attr.pathname)
+        local_pathname_hash = FileAttr.hash_pathname(local_pathname)
+        return local_pathname, local_pathname_hash
 
     def _add_file(self, file_attr):
-        rel_pathname, rel_pathname_hash = self._relative_data(file_attr)
-        self.hash_to_files[file_attr.hash].append(rel_pathname)
-        self.pathnames_attr[rel_pathname_hash] = {
+        local_pathname, local_pathname_hash = self._local_data(file_attr)
+        self.hash_to_files[file_attr.hash].append(local_pathname)
+        self.pathnames_attr[local_pathname_hash] = {
             SIZE: file_attr.size,
             LMTIME: file_attr.lmtime,
             HASH: file_attr.hash,
-            PATHNAME: rel_pathname
+            PATHNAME: local_pathname
         }
-        self.known_pathnames.add(rel_pathname_hash)
+        self.known_pathnames.add(local_pathname_hash)
 
     def add_file(self, file_attr):
-        rel_pathname, _ = self._relative_data(file_attr)
         if not self.is_file_known(file_attr):
             self._add_file(file_attr)
 
     def is_file_known(self, file_attr):
-        rel_pathname, pathname_hash = self._relative_data(file_attr)
-        if pathname_hash not in self.known_pathnames:
+        local_pathname, local_pathname_hash = self._local_data(file_attr)
+        if local_pathname_hash not in self.known_pathnames:
             return False
         else:
-            stored_attr = self.pathnames_attr[pathname_hash]
+            stored_attr = self.pathnames_attr[local_pathname_hash]
             diff_size = stored_attr[SIZE] != file_attr.size
             diff_time = stored_attr[LMTIME] != file_attr.lmtime
             if diff_size or diff_time:
-                self.remove_pathname(rel_pathname)
+                self._remove_pathname(local_pathname)
                 return False
             return True
 
@@ -119,12 +121,17 @@ class FileStore(object):
         self._data[LAST_UPDATE] = serialize_date(datetime.utcnow())
         self._to_json()
 
-    def remove_pathname(self, pathname):
-        rel_pathname_hash = FileAttr.hash_pathname(self._rel_path(pathname))
-        self.known_pathnames.remove(rel_pathname_hash)
-        stored_data = self.pathnames_attr[rel_pathname_hash]
-        self.hash_to_files[stored_data['hash']].remove(stored_data['pathname'])
-        del(self.pathnames_attr[rel_pathname_hash])
+    def _remove_pathname(self, local_pathname):
+        local_pathname_hash = FileAttr.hash_pathname(local_pathname)
+        self.known_pathnames.remove(local_pathname_hash)
+        stored_data = self.pathnames_attr[local_pathname_hash]
+        self.hash_to_files[stored_data[HASH]].remove(stored_data[PATHNAME])
+        del(self.pathnames_attr[local_pathname_hash])
+
+    def remove_pathname(self, abs_pathname):
+        assert(os.path.isabs(abs_pathname))
+        local_pathname = self._local_path(abs_pathname)
+        self._remove_pathname(local_pathname)
 
     def duplicates(self):
         for _, paths in self.hash_to_files.iteritems():

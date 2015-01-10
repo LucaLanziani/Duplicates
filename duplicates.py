@@ -27,12 +27,15 @@ WHITELISTED_EXTENTIONS = ['.gif', '.jpeg', '.jpg', '.png']
 
 class Duplicates():
 
-    def __init__(self, args):
+    def __init__(self, opt):
+        self._parse_opt(opt)
         self._show_progress = self._pass
-        self._first_n = float(args['--first_n'])
-        self.directory = absolute_path(args['DIRECTORY'])
         self._store = FileStore(self.directory)
         self._pathname_sha_cache = {}
+
+    def _parse_opt(self, opt):
+        self._first_n = float(opt['--first_n'])
+        self.directory = absolute_path(opt['DIRECTORY'])
 
     def _pass(self):
         pass
@@ -86,12 +89,12 @@ class Duplicates():
             self._store.save()
 
 
-def main(args):
-    args = validate_args(args)
-    Duplicates(args).run()
+def main(opt):
+    opt = validate_args(opt)
+    Duplicates(opt).run()
 
 
-def validate_args(args):
+def validate_args(opt):
     schema = Schema({
         'DIRECTORY': And(os.path.exists, error="DIRECTORY does not exists"),
         '--first_n': Or(u'inf', And(Use(int)),
@@ -103,12 +106,12 @@ def validate_args(args):
         Optional('--list'): bool
     })
     try:
-        args = schema.validate(args)
+        opt = schema.validate(opt)
     except SchemaError as e:
         exit(e)
-    return args
+    return opt
 
 if __name__ == '__main__':
-    args = docopt(__doc__, argv=None, help=True,
-                  version=None, options_first=False)
-    main(args)
+    opt = docopt(__doc__, argv=None, help=True,
+                 version=None, options_first=False)
+    main(opt)

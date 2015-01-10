@@ -4,6 +4,7 @@
 
 Options:
     --first_n N         stop after N files [default: inf]
+    --verbose           print status update in console
     --clean             remove deleted file from the index  # TODO
     --progress          show the progress  # TODO
     --dry-run           display the pathnames  # TODO
@@ -13,15 +14,15 @@ Options:
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
-import signal
 import os
+import signal
 
 from data_store import FileStore, FILESTORE
 from docopt import docopt
 from file_attr import FileAttrFactory
-from utils import absolute_path
+from output import ConsoleOutput, DummyOutput
 from schema import And, Optional, Or, Schema, SchemaError, Use
-
+from utils import absolute_path
 
 WHITELISTED_EXTENTIONS = ['.gif', '.jpeg', '.jpg', '.png']
 
@@ -30,26 +31,19 @@ class Duplicates():
 
     def __init__(self, opt):
         self._parse_opt(opt)
-        self._show_progress = self._pass
         self._store = FileStore(self.directory)
         self._pathname_sha_cache = {}
 
     def _parse_opt(self, opt):
+        self.output = DummyOutput()
+        if opt["--verbose"]:
+            self.output = ConsoleOutput()
         self._first_n = float(opt['--first_n'])
         self.directory = absolute_path(opt['DIRECTORY'])
 
-    def _pass(self):
-        pass
-
     def _print_state(self, signum, stack):
         analized = len(self._store.known_pathnames)
-        print(
-            'Added %s/%s (%.2f%%) files' % (
-                analized,
-                self._total_files,
-                100/(self._total_files/analized)
-            )
-        )
+        self.output.status(analized, self._total_files)
 
     def _file_number(self):
         self._total_files = len(list(self.dir_content()))
@@ -92,7 +86,8 @@ class Duplicates():
     def collect_data(self):
         for pathname in self.dir_content():
             self._store.add_file(FileAttrFactory.by_pathname(pathname))
-            self._show_progress()
+            self._print_state(None, None)
+        self.output.print()
 
     def run(self):
         self._file_number()
@@ -103,7 +98,7 @@ class Duplicates():
             self._store.save()
         else:
             self._store.save()
-            print("Saving the result")
+            self.output.print("Saving the result")
 
 
 def main(opt):
@@ -120,7 +115,8 @@ def validate_args(opt):
         Optional('--progress'): bool,
         Optional('--dry-run'): bool,
         Optional('--find-file'): bool,
-        Optional('--list'): bool
+        Optional('--list'): bool,
+        Optional('--verbose'): bool
     })
     try:
         opt = schema.validate(opt)

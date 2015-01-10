@@ -56,6 +56,14 @@ class Duplicates():
         self._total_files = len(list(self.dir_content()))
         self._first_n = first_n
 
+    def _valid_pathname(self, pathname):
+        return (
+            self._first_n > 0 and
+            os.path.isfile(pathname) and
+            (not self._extensions or
+                os.path.splitext(pathname)[1].lower() in self._extensions)
+        )
+
     def dir_content(self, recursive=True):
         """
         yield white-listed files in the passed directory
@@ -65,15 +73,13 @@ class Duplicates():
             first_n: limit the number of files return by this function
         """
 
-        first_n = self._first_n
         for pathname in self._dir_content(recursive):
-            if first_n > 0:
-                if (not self._extensions or
-                   os.path.splitext(pathname)[1].lower() in self._extensions):
-                    yield pathname
-                    first_n -= 1
-            else:
-                break
+            if self._valid_pathname(pathname):
+                yield pathname
+
+                self._first_n -= 1
+                if self._first_n == 0:
+                    break
 
     def _dir_content(self, recursive=True):
         dir_name = self.directory

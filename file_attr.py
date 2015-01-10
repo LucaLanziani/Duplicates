@@ -94,7 +94,7 @@ class FileAttr(object):
 
     @staticmethod
     def hash_pathname(pathname):
-        return hashlib.sha256(pathname).hexdigest()
+        return hashlib.sha256(pathname.encode('utf-8')).hexdigest()
 
     def similar(self, other):
         return (

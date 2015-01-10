@@ -1,6 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-"""Usage: duplicates.py [options] DIRECTORY
+"""Usage: duplicates.py [options] DIRECTORY [<ext>...]
+
+You can filter the analyzed files passing multiple extensions to the software
 
 Options:
     --first_n N         stop after N files [default: inf]
@@ -10,6 +12,11 @@ Options:
     --dry-run           display the pathnames  # TODO
     --find-file         find duplicates of a given file  # TODO
     --list              list all files in the given directory  # TODO
+
+Examples:
+    ./duplicates.py .            # every file
+    ./duplicates.py . .png       # only .png files
+    ./duplicates.py . .png .jpg  # .png and .jpg files
 """
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
@@ -24,8 +31,6 @@ from output import ConsoleOutput, DummyOutput
 from schema import And, Optional, Or, Schema, SchemaError, Use
 from utils import absolute_path
 
-WHITELISTED_EXTENTIONS = ['.gif', '.jpeg', '.jpg', '.png']
-
 
 class Duplicates():
 
@@ -38,6 +43,7 @@ class Duplicates():
         self.output = DummyOutput()
         if opt["--verbose"]:
             self.output = ConsoleOutput()
+        self._extensions = set(opt['<ext>'])
         self._first_n = float(opt['--first_n'])
         self.directory = absolute_path(opt['DIRECTORY'])
 
@@ -58,10 +64,10 @@ class Duplicates():
         """
 
         first_n = self._first_n
-        whitelist_ext = set(WHITELISTED_EXTENTIONS)
         for pathname in self._dir_content(recursive):
             if first_n > 0:
-                if os.path.splitext(pathname)[1].lower() in whitelist_ext:
+                if (not self._extensions or
+                   os.path.splitext(pathname)[1].lower() in self._extensions):
                     yield pathname
                     first_n -= 1
             else:
@@ -116,7 +122,8 @@ def validate_args(opt):
         Optional('--dry-run'): bool,
         Optional('--find-file'): bool,
         Optional('--list'): bool,
-        Optional('--verbose'): bool
+        Optional('--verbose'): bool,
+        Optional('<ext>'): []
     })
     try:
         opt = schema.validate(opt)

@@ -46,6 +46,9 @@ class FileAttrTest(unittest.TestCase):
     def similarity_test(self):
         eq_(self.file_attr.similar(self.file_attr), True)
 
+    def unicode_filename_test(self):
+        FileAttr('./test/files/03_Руководство_по_эксплуатации.jpg')
+
 
 class FileAttrFactoryTest(unittest.TestCase):
 

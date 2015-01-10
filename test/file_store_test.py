@@ -4,12 +4,10 @@ from __future__ import (absolute_import, division, print_function,
 
 import os
 import unittest
-from time import sleep
 
 from data_store import FileStore, FILESTORE
 from file_attr import FileAttr
 from nose.tools import eq_
-
 from utils import absolute_path
 
 TEST_DIR = './test/files/'
@@ -52,3 +50,11 @@ class FileStoreTest(unittest.TestCase):
         self.store.save()
         store = FileStore(TEST_DIR)
         eq_(True, store.is_file_known(self.file_attr))
+
+    def unknow_file_test(self):
+        eq_(False, self.store.is_file_known(self.file_attr))
+
+    def different_lmtime_file_test(self):
+        self.store.add_file(self.file_attr)
+        os.utime(TEST_FILE, None)
+        eq_(False, self.store.is_file_known(self.file_attr))

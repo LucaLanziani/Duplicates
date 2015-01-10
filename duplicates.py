@@ -52,7 +52,9 @@ class Duplicates():
         self.output.status(analized, self._total_files)
 
     def _file_number(self):
+        first_n = self._first_n
         self._total_files = len(list(self.dir_content()))
+        self._first_n = first_n
 
     def dir_content(self, recursive=True):
         """

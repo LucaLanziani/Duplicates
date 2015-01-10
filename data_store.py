@@ -87,7 +87,6 @@ class FileStore(object):
             diff_size = stored_attr[SIZE] != file_attr.size
             diff_time = stored_attr[LMTIME] != file_attr.lmtime
             if diff_size or diff_time:
-                self._remove_pathname(local_pathname)
                 return False
             return True
 

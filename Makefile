@@ -18,3 +18,6 @@ UPDATE_ENV: CHECK_ENV requirements.txt
 
 TESTS: CHECK_ENV
 	nosetests
+
+FLAKE8: CHECK_ENV
+	flake8

@@ -131,7 +131,13 @@ def validate_args(opt):
         Optional('--find-file'): bool,
         Optional('--list'): bool,
         Optional('--verbose'): bool,
-        Optional('<ext>'): []
+        Optional('<ext>'): [
+            And(
+                str,
+                Use(str.lower),
+                lambda s: s.startswith('.'),
+                error="Did you remember the dot?")
+        ]
     })
     try:
         opt = schema.validate(opt)

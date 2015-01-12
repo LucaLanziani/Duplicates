@@ -106,7 +106,7 @@ def validate_args(opt):
                 str,
                 Use(str.lower),
                 lambda s: s.startswith('.'),
-                error="Did you remember the dot?")
+                error="Did you remember the dot in the extensions?")
         ]
     })
     try:

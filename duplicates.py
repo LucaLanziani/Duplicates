@@ -48,7 +48,7 @@ class Duplicates():
 
     def _print_state(self, signum, stack):
         analized = len(self._store.known_pathnames)
-        self.output.status(analized, self._total_files)
+        self.output.status(analized, self._filtered, self._total_files)
 
     def _file_number(self):
         self._content = list(self._directory.dir_content())

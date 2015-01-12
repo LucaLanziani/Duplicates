@@ -9,7 +9,7 @@ class DummyOutput():
     def __init__(self):
         pass
 
-    def status(self, analized, total):
+    def status(self, *args):
         pass
 
     def print(self, *args, **kwdargs):
@@ -21,15 +21,18 @@ class ConsoleOutput(object):
     def __init__(self):
         super(ConsoleOutput, self).__init__()
 
-    def status(self, analized, total):
+    def status(self, analized, filtered, total):
         percentage = 0
         if analized > 0:
-            percentage = 100/(total/analized)
-        max_length = len(str(total))
-        msg = '%%%ss/%%%ss (%%5.2f%%%%) files' % (max_length, max_length)
+            percentage = 100 / (filtered / analized)
+
+        msg = '%%%(size)ss/%%%(size)ss/%%%(size)ss (%%5.2f%%%%) files' % {
+            'size': len(str(total))
+        }
         sys.stdout.write("\r")
         sys.stdout.write(msg % (
             analized,
+            filtered,
             total,
             percentage
         ))

@@ -22,21 +22,20 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import os
-import signal
 
-from data_store import FileStore, FILESTORE
 from docopt import docopt
+from data_store import FileStore
+from directory import Directory
 from file_attr import FileAttrFactory
 from output import ConsoleOutput, DummyOutput
 from schema import And, Optional, Or, Schema, SchemaError, Use
-from utils import absolute_path
 
 
 class Duplicates():
 
     def __init__(self, opt):
         self._parse_opt(opt)
-        self._store = FileStore(self.directory)
+        self._store = FileStore(self._directory.pathname)
         self._pathname_sha_cache = {}
 
     def _parse_opt(self, opt):
@@ -45,74 +44,45 @@ class Duplicates():
             self.output = ConsoleOutput()
         self._extensions = set(opt['<ext>'])
         self._first_n = float(opt['--first_n'])
-        self.directory = absolute_path(opt['DIRECTORY'])
+        self._directory = Directory(opt['DIRECTORY'])
 
     def _print_state(self, signum, stack):
         analized = len(self._store.known_pathnames)
         self.output.status(analized, self._total_files)
 
     def _file_number(self):
-        first_n = self._first_n
-        self._total_files = len(list(self.dir_content()))
-        self._first_n = first_n
+        self._content = list(self._directory.dir_content())
+        self._total_files = len(self._content)
+        self._filtered = len(filter(self._valid_pathname, self._content))
 
     def _valid_pathname(self, pathname):
         return (
-            self._first_n > 0 and
+            pathname != self._store.store_path and
             os.path.isfile(pathname) and
             (not self._extensions or
                 os.path.splitext(pathname)[1].lower() in self._extensions)
         )
 
-    def dir_content(self, recursive=True):
-        """
-        yield white-listed files in the passed directory
-
-        Args:
-            recursive: navigate recursively all the directory tree
-            first_n: limit the number of files return by this function
-        """
-
-        for pathname in self._dir_content(recursive):
-            if self._valid_pathname(pathname):
-                yield pathname
-
-                self._first_n -= 1
-                if self._first_n == 0:
-                    break
-
-    def _dir_content(self, recursive=True):
-        dir_name = self.directory
-        for root, dirs, files in os.walk(unicode(dir_name)):
-            excluded_dirs = []
-            for directory in dirs:
-                if os.path.exists(os.path.join(root, directory, FILESTORE)):
-                    excluded_dirs.append(directory)
-
-            for folder in excluded_dirs:
-                dirs.remove(folder)
-
-            for name in files:
-                yield os.path.join(root, name)
-            if not recursive:
-                break
-
     def collect_data(self):
-        for pathname in self.dir_content():
+        content = self._directory.dir_content(
+            pathname_filter=self._valid_pathname,
+            limit=self._first_n
+        )
+        for pathname in content:
             self._store.add_file(FileAttrFactory.by_pathname(pathname))
             self._print_state(None, None)
         self.output.print()
 
-    def run(self):
+    def _initialize(self):
         self._file_number()
-        signal.signal(signal.SIGUSR1, self._print_state)
-        try:
-            self.collect_data()
-        except KeyboardInterrupt:
-            self._store.save()
-        else:
-            self._store.save()
-            self.output.print("Saving the result")
+
+    def _terminate(self):
+        self._store.save()
+
+    def run(self):
+        self._initialize()
+        self.collect_data()
+        self._terminate()
 
 
 def main(opt):

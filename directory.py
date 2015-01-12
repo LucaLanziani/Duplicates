@@ -7,13 +7,18 @@ import os
 from utils import absolute_path
 
 
+class DirNotFoundError(Exception):
+    pass
+
+
 class Directory(object):
     """Describe a directory"""
 
     def __init__(self, path):
         super(Directory, self).__init__()
         self._directory = absolute_path(path)
-        assert os.path.isdir(self._directory)
+        if not os.path.isdir(self._directory):
+            raise DirNotFoundError(self._directory)
 
     def dir_content(self, recursive=True, limit=float("inf"),
                     pathname_filter=None):
@@ -30,12 +35,11 @@ class Directory(object):
             pathname_filter = lambda pathname: True
 
         for pathname in self._dir_content(recursive):
+            limit -= 1
+            if limit < 0:
+                break
             if pathname_filter(pathname):
                 yield pathname
-
-                limit -= 1
-                if limit == 0:
-                    break
 
     def _dir_content(self, recursive=True):
         dir_name = self._directory

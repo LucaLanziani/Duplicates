@@ -33,8 +33,8 @@ class FileStore(object):
     """
     def __init__(self, directory):
         super(FileStore, self).__init__()
-        self.base_dir = absolute_path(directory)
-        self.store_path = os.path.join(self.base_dir, FILESTORE)
+        self._base_dir = absolute_path(directory)
+        self.store_path = os.path.join(self._base_dir, FILESTORE)
         self.load()
 
     def _from_json(self):
@@ -56,7 +56,7 @@ class FileStore(object):
             json.dump(self._data, fd, indent=4)
 
     def _local_path(self, abs_pathname):
-        return abs_pathname.replace(self.base_dir, '.')
+        return abs_pathname.replace(self._base_dir, '.')
 
     def _local_data(self, file_attr):
         local_pathname = self._local_path(file_attr.pathname)

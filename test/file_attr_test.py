@@ -4,7 +4,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import unittest
 
-from file_attr import FileAttr, FileNotFoundError, FileAttrFactory
+from duplicates.file_attr import FileAttr, FileNotFoundError, FileAttrFactory
 from nose.tools import raises, eq_
 
 TEST_FILE = './test/files/empty file.exe.test'

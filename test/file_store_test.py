@@ -5,10 +5,10 @@ from __future__ import (absolute_import, division, print_function,
 import os
 import unittest
 
-from data_store import FileStore, FILESTORE
-from file_attr import FileAttr
+from duplicates.data_store import FileStore, FILESTORE
+from duplicates.file_attr import FileAttr
+from duplicates.utils import absolute_path
 from nose.tools import eq_
-from utils import absolute_path
 
 TEST_DIR = './test/files/'
 TEST_FILE = './test/files/empty file.exe.test'

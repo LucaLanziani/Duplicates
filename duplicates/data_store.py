@@ -8,8 +8,9 @@ import os
 from collections import defaultdict
 from datetime import datetime
 
-from file_attr import FileAttr
-from utils import absolute_path, serialize_date, deserialize_date, epoch
+from duplicates.file_attr import FileAttr
+from duplicates.utils import (absolute_path, serialize_date,
+                              deserialize_date, epoch)
 
 FILESTORE = ".duplicates.json"
 FILESTORE = ".duplicates.json.gz"

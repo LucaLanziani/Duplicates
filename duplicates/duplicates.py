@@ -24,10 +24,10 @@ from __future__ import (absolute_import, division, print_function,
 import os
 
 from docopt import docopt
-from data_store import FileStore
-from directory import Directory
-from file_attr import FileAttrFactory
-from output import ConsoleOutput, DummyOutput
+from duplicates.data_store import FileStore
+from duplicates.directory import Directory
+from duplicates.file_attr import FileAttrFactory
+from duplicates.output import ConsoleOutput, DummyOutput
 from schema import And, Optional, Or, Schema, SchemaError, Use
 
 
@@ -85,11 +85,6 @@ class Duplicates():
         self._terminate()
 
 
-def main(opt):
-    opt = validate_args(opt)
-    Duplicates(opt).run()
-
-
 def validate_args(opt):
     schema = Schema({
         'DIRECTORY': And(os.path.exists, error="DIRECTORY does not exists"),
@@ -115,7 +110,11 @@ def validate_args(opt):
         exit(e)
     return opt
 
-if __name__ == '__main__':
+def main():
     opt = docopt(__doc__, argv=None, help=True,
                  version=None, options_first=False)
-    main(opt)
+    opt = validate_args(opt)
+    Duplicates(opt).run()
+
+if __name__ == '__main__':
+    main()

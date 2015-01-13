@@ -4,7 +4,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import os
 
-from utils import absolute_path
+from duplicates.utils import absolute_path
 
 
 class DirNotFoundError(Exception):

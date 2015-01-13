@@ -6,7 +6,7 @@ import os
 import hashlib
 import stat
 
-from utils import absolute_path
+from duplicates.utils import absolute_path
 
 BLOCKSIZE = 65536
 

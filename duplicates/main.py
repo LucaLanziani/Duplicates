@@ -7,11 +7,6 @@ You can filter the analyzed files passing multiple extensions to the software
 Options:
     --first_n N         stop after N files [default: inf]
     --verbose           print status update in console
-    --clean             remove deleted file from the index  # TODO
-    --progress          show the progress  # TODO
-    --dry-run           display the pathnames  # TODO
-    --find-file         find duplicates of a given file  # TODO
-    --list              list all files in the given directory  # TODO
 
 Examples:
     %(name)s .            # every file
@@ -90,11 +85,6 @@ def validate_args(opt):
         'DIRECTORY': And(os.path.exists, error="DIRECTORY does not exists"),
         '--first_n': Or(u'inf', And(Use(int)),
                         error="--first_n=N should be integer"),
-        Optional('--clean'): bool,
-        Optional('--progress'): bool,
-        Optional('--dry-run'): bool,
-        Optional('--find-file'): bool,
-        Optional('--list'): bool,
         Optional('--verbose'): bool,
         Optional('<ext>'): [
             And(
@@ -110,6 +100,7 @@ def validate_args(opt):
         exit(e)
     return opt
 
+
 def run(name=None):
     if name is None:
         name = __file__
@@ -117,6 +108,7 @@ def run(name=None):
                  version=None, options_first=False)
     opt = validate_args(opt)
     Duplicates(opt).run()
+
 
 if __name__ == '__main__':
     run()

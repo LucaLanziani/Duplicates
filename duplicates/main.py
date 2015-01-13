@@ -7,6 +7,7 @@ You can filter the analyzed files passing multiple extensions to the software
 Options:
     --first_n N         stop after N files [default: inf]
     --verbose           print status update in console
+    --no-store          do not save the gathered information on filesystem
 
 Examples:
     %(name)s .            # every file
@@ -40,6 +41,7 @@ class Duplicates():
         self._extensions = set(opt['<ext>'])
         self._first_n = float(opt['--first_n'])
         self._directory = Directory(opt['DIRECTORY'])
+        self._allow_save = not opt['--no-store']
 
     def _print_state(self, signum, stack):
         analized = len(self._store.known_pathnames)
@@ -72,7 +74,8 @@ class Duplicates():
         self._file_number()
 
     def _terminate(self):
-        self._store.save()
+        if self._allow_save:
+            self._store.save()
 
     def run(self):
         self._initialize()
@@ -86,6 +89,7 @@ def validate_args(opt):
         '--first_n': Or(u'inf', And(Use(int)),
                         error="--first_n=N should be integer"),
         Optional('--verbose'): bool,
+        Optional('--no-store'): bool,
         Optional('<ext>'): [
             And(
                 str,

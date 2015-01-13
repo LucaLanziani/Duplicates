@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-from duplicates import duplicates
+from duplicates import main
 
 if __name__ == '__main__':
-    duplicates.main()
+    main.run(__file__)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-"""Usage: duplicates.py [options] DIRECTORY [<ext>...]
+"""Usage: %(name)s [options] DIRECTORY [<ext>...]
 
 You can filter the analyzed files passing multiple extensions to the software
 
@@ -14,9 +14,9 @@ Options:
     --list              list all files in the given directory  # TODO
 
 Examples:
-    ./duplicates.py .            # every file
-    ./duplicates.py . .png       # only .png files
-    ./duplicates.py . .png .jpg  # .png and .jpg files
+    %(name)s .            # every file
+    %(name)s . .png       # only .png files
+    %(name)s . .png .jpg  # .png and .jpg files
 """
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
@@ -110,11 +110,13 @@ def validate_args(opt):
         exit(e)
     return opt
 
-def main():
-    opt = docopt(__doc__, argv=None, help=True,
+def run(name=None):
+    if name is None:
+        name = __file__
+    opt = docopt(__doc__ % {'name': name}, argv=None, help=True,
                  version=None, options_first=False)
     opt = validate_args(opt)
     Duplicates(opt).run()
 
 if __name__ == '__main__':
-    main()
+    run()

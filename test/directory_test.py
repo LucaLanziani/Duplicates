@@ -10,7 +10,6 @@ from nose.tools import assert_greater, eq_, raises
 
 class DirectoryTest(unittest.TestCase):
 
-
     def setUp(self):
         self._dir = Directory('./test/files')
 

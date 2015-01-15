@@ -15,6 +15,7 @@ UPDATE_ENV: CHECK_ENV requirements.txt
 	pip install --upgrade setuptools
 	pip install --upgrade pip
 	pip install -r requirements.txt
+	pip install -e .  # install the duplicates package locally
 
 TESTS: CHECK_ENV
 	nosetests

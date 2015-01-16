@@ -27,34 +27,34 @@ class FileStoreTest(unittest.TestCase):
         except OSError:
             pass
 
-    def store_path_will_be_in_cwd_test(self):
+    def test_store_path_will_be_in_cwd(self):
         expected_path = os.path.join(os.path.abspath(TEST_DIR), FILESTORE)
         eq_(expected_path, self.store.store_path)
 
-    def add_pathname_test(self):
+    def test_add_pathname(self):
         self.store.add_file(self.file_attr)
         eq_(True, self.store.is_file_known(self.file_attr))
 
-    def remove_pathnane_test(self):
-        self.add_pathname_test()
+    def test_remove_pathname(self):
+        self.test_add_pathname()
         self.store.remove_pathname(absolute_path(TEST_FILE))
         eq_(False, self.store.is_file_known(self.file_attr))
 
-    def save_test(self):
+    def test_save(self):
         self.store.add_file(self.file_attr)
         self.store.save()
         eq_(True, os.path.isfile(self.store.store_path))
 
-    def load_test(self):
+    def test_load(self):
         self.store.add_file(self.file_attr)
         self.store.save()
         store = FileStore(TEST_DIR)
         eq_(True, store.is_file_known(self.file_attr))
 
-    def unknow_file_test(self):
+    def test_unknow_file(self):
         eq_(False, self.store.is_file_known(self.file_attr))
 
-    def different_lmtime_file_test(self):
+    def test_different_lmtime_file(self):
         self.store.add_file(self.file_attr)
         os.utime(TEST_FILE, None)
         eq_(False, self.store.is_file_known(self.file_attr))

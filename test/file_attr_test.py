@@ -22,37 +22,37 @@ class FileAttrTest(unittest.TestCase):
         pass
 
     @raises(FileNotFoundError)
-    def raise_if_file_not_exist_test(self):
+    def test_raise_if_file_not_exist(self):
         FileAttr(TEST_FILE.replace('test', 'notExists'))
 
-    def md5_test(self):
+    def test_md5(self):
         eq_(self.file_attr.md5, MD5)
 
-    def sha1_test(self):
+    def test_sha1(self):
         eq_(self.file_attr.sha1, SHA1)
 
-    def sha256_test(self):
+    def test_sha256(self):
         eq_(self.file_attr.sha256, SHA256)
 
-    def hash_test(self):
+    def test_hash(self):
         eq_(self.file_attr.hash, MD5)
 
-    def size_test(self):
+    def test_size(self):
         eq_(self.file_attr.size, 0)
 
-    def extention_test(self):
+    def test_extention(self):
         eq_(self.file_attr.extention, '.test')
 
-    def similarity_test(self):
+    def test_similarity(self):
         eq_(self.file_attr.similar(self.file_attr), True)
 
-    def unicode_filename_test(self):
+    def test_unicode_filename(self):
         FileAttr('./test/files/03_Руководство_по_эксплуатации.jpg')
 
 
 class FileAttrFactoryTest(unittest.TestCase):
 
-    def by_pathname_test(self):
+    def test_by_pathname(self):
         first = FileAttrFactory.by_pathname(TEST_FILE)
         second = FileAttrFactory.by_pathname(TEST_FILE)
         eq_(first, second)

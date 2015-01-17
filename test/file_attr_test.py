@@ -14,6 +14,7 @@ SHA256 = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
 
 UNICODE_PATHNAME = './test/files/03_Руководство_по_эксплуатации.jpg'
 
+
 class FileAttrTest(unittest.TestCase):
 
     def setUp(self):
@@ -51,7 +52,6 @@ class FileAttrTest(unittest.TestCase):
         fa = FileAttr(UNICODE_PATHNAME)
         eq_(fa.hash_pathname(UNICODE_PATHNAME),
             '88f781908c7537dcb8b24f294c38b5ccc87ac0481cf203091766ab916a5b510d')
-
 
 
 class FileAttrFactoryTest(unittest.TestCase):

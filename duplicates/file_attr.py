@@ -81,7 +81,7 @@ class FileAttr(object):
 
     @property
     @cache_result
-    def pathname_hash(self):
+    def abs_pathname_hash(self):
         return FileAttr.hash_pathname(self._abs_pathname)
 
     @property
@@ -117,7 +117,7 @@ class FileAttrFactory(object):
         abs_pathname = absolute_path(pathname)
         store = cls.filesAttr
         file_attr = FileAttr(abs_pathname)
-        key = file_attr.pathname_hash
+        key = file_attr.abs_pathname_hash
         if (key not in store or not store[key].similar(file_attr)):
             cls.filesAttr[key] = file_attr
 

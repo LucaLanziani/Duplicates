@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Usage: %(name)s [options] DIRECTORY [<ext>...]
+"""Usage: %(name)s [options] DIRECTORY [PATTERNS...]
 
-You can filter the analyzed files passing multiple extensions to the software
+You can filter the analyzed files passing multiple patterns through command
+line, the patterns can include "Unix shell-style wildcards"
 
 Options:
-    --first_n N         stop after N files [default: inf]
-    --verbose           print status update in console
-    --no-store          do not save the gathered information on filesystem
+    --first_n N       stop after N files [default: inf]
+    --verbose         print status update in console
+    --no-store        do not save the gathered information on filesystem
 
 Examples:
-    %(name)s .            # every file
-    %(name)s . .png       # only .png files
-    %(name)s . .png .jpg  # .png and .jpg files
+    %(name)s .                  # every file
+    %(name)s . '*.png'          # only .png files
+    %(name)s . '*.png' '*.jpg'  # .png and .jpg files
 """
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
@@ -23,6 +24,7 @@ from docopt import docopt
 from duplicates.data_store import FileStore
 from duplicates.directory import Directory
 from duplicates.file_attr import FileAttrFactory
+from duplicates.filters import UnixShellWildcardsFilter
 from duplicates.output import ConsoleOutput, DummyOutput
 from schema import And, Optional, Or, Schema, SchemaError, Use
 
@@ -38,7 +40,7 @@ class Duplicates():
         self.output = DummyOutput()
         if opt["--verbose"]:
             self.output = ConsoleOutput()
-        self._extensions = set(opt['<ext>'])
+        self._unixpatterns_filter = UnixShellWildcardsFilter(opt['PATTERNS'])
         self._first_n = float(opt['--first_n'])
         self._directory = Directory(opt['DIRECTORY'])
         self._allow_save = not opt['--no-store']
@@ -56,16 +58,20 @@ class Duplicates():
         return (
             pathname != self._store.store_path and
             os.path.isfile(pathname) and
-            (not self._extensions or
-                os.path.splitext(pathname)[1].lower() in self._extensions)
+            (not self._unixpatterns_filter.enabled or
+                self._unixpatterns_filter.match(pathname))
         )
 
-    def collect_data(self):
+    def _file_list(self):
         content = self._directory.dir_content(
             pathname_filter=self._valid_pathname,
             limit=self._first_n
         )
         for pathname in content:
+            yield pathname
+
+    def collect_data(self):
+        for pathname in self._file_list():
             self._store.add_file(FileAttrFactory.by_pathname(pathname))
             self._print_state(None, None)
         self.output.print()
@@ -90,13 +96,7 @@ def validate_args(opt):
                         error="--first_n=N should be integer"),
         Optional('--verbose'): bool,
         Optional('--no-store'): bool,
-        Optional('<ext>'): [
-            And(
-                str,
-                Use(str.lower),
-                lambda s: s.startswith('.'),
-                error="Did you remember the dot in the extensions?")
-        ]
+        Optional('PATTERNS'): [str]
     })
     try:
         opt = schema.validate(opt)

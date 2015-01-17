@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function,
 import os
 import unittest
 
-from duplicates.data_store import FileStore, FILESTORE
+from duplicates.data_store import FILESTORE, FileStore
 from duplicates.file_attr import FileAttr
 from duplicates.utils import absolute_path
 from nose.tools import eq_

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import (absolute_import, print_function, unicode_literals,
-                        division)
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
-import os
 import hashlib
+import os
 import stat
 
 from duplicates.utils import absolute_path

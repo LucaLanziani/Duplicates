@@ -33,7 +33,9 @@ class Directory(object):
                              and returns True or False
         """
         if pathname_filter is None:
-            pathname_filter = lambda pathname: True
+            def true(pathname):
+                return True
+            pathname_filter = true
 
         for pathname in self._dir_content(recursive):
             limit -= 1

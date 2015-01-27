@@ -32,10 +32,13 @@ class FileStore(object):
     all the pathnames in the filestore are "local", by "local" we intend a
     relative pathname from the filestore location.
     """
-    def __init__(self, directory):
+
+    def __init__(self, filepath):
         super(FileStore, self).__init__()
-        self._base_dir = absolute_path(directory)
-        self.store_path = os.path.join(self._base_dir, FILESTORE)
+        self.store_path = absolute_path(filepath)
+        if os.path.isdir(self.store_path):
+            self.store_path = os.path.join(self.store_path, FILESTORE)
+        self._base_dir = os.path.dirname(self.store_path)
         self.load()
 
     def _from_json(self):

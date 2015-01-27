@@ -12,7 +12,8 @@ from nose.tools import eq_
 
 TEST_DIR = './test/files/'
 TEST_FILE = './test/files/empty file.exe.test'
-FILE_STORE_PATH = os.path.join(os.path.abspath(TEST_DIR), FILESTORE)
+
+FILESTORE_PATH = os.path.join(os.path.abspath(TEST_DIR), FILESTORE)
 
 
 class FileStoreTest(unittest.TestCase):
@@ -23,9 +24,13 @@ class FileStoreTest(unittest.TestCase):
 
     def tearDown(self):
         try:
-            os.remove(FILE_STORE_PATH)
+            os.remove(FILESTORE_PATH)
         except OSError:
             pass
+
+    def _add_file_and_save(self, filestore):
+        filestore.add_file(self.file_attr)
+        filestore.save()
 
     def test_store_path_will_be_in_cwd(self):
         expected_path = os.path.join(os.path.abspath(TEST_DIR), FILESTORE)
@@ -41,13 +46,11 @@ class FileStoreTest(unittest.TestCase):
         eq_(False, self.store.is_file_known(self.file_attr))
 
     def test_save(self):
-        self.store.add_file(self.file_attr)
-        self.store.save()
+        self._add_file_and_save(self.store)
         eq_(True, os.path.isfile(self.store.store_path))
 
     def test_load(self):
-        self.store.add_file(self.file_attr)
-        self.store.save()
+        self._add_file_and_save(self.store)
         store = FileStore(TEST_DIR)
         eq_(True, store.is_file_known(self.file_attr))
 
@@ -55,6 +58,30 @@ class FileStoreTest(unittest.TestCase):
         eq_(False, self.store.is_file_known(self.file_attr))
 
     def test_different_lmtime_file(self):
+
         self.store.add_file(self.file_attr)
         os.utime(TEST_FILE, None)
         eq_(False, self.store.is_file_known(self.file_attr))
+
+    def test_using_filepath(self):
+        store = FileStore(FILESTORE_PATH)
+        self._add_file_and_save(store)
+        eq_(True, os.path.isfile(FILESTORE_PATH))
+
+    def test_load_old_data_version(self):
+        def from_json():
+            return {
+                'known_pathnames': [],
+                'pathnames_attr': {},
+                'hash_to_files': {}
+            }
+
+        def to_json(data):
+            assert 'known_pathnames_hashes' in data
+            assert 'file_hash_to_pathnames' in data
+            assert 'pathname_hash_to_attrs' in data
+
+        self.store._from_json = from_json
+        self.store._to_json = to_json
+        self.store.load()
+        self.store.save()

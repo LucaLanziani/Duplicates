@@ -31,10 +31,10 @@ class Duplicates():
         self._unixpatterns_filter = UnixShellWildcardsFilter(unix_patterns)
 
     def _print_state(self, signum, stack):
-        analized = len(self._store.known_pathnames)
+        analized = len(self._store)
         self.output.status(analized, self._filtered, self._total_files)
 
-    def _file_number(self):
+    def _get_file_number(self):
         self._content = list(self._directory.dir_content())
         self._total_files = len(self._content)
         self._filtered = len(filter(self._valid_pathname, self._content))
@@ -58,24 +58,17 @@ class Duplicates():
         """
         Collect files data and return the store object
         """
+        self._get_file_number()
         for pathname in self._file_list():
             self._store.add_file(FileAttrFactory.by_pathname(pathname))
             self._print_state(None, None)
         self.output.print()
         return self._store
 
-    def _initialize(self):
-        self._file_number()
-
-    def _terminate(self):
-        pass
-
     def run(self, store=True):
-        self._initialize()
-        self.collect_data()
+        data = self.collect_data()
         if store:
-            self._store.save()
-        self._terminate()
+            data.save()
 
 
 class CommandLineInterface(object):

@@ -18,7 +18,7 @@ UPDATE_ENV: CHECK_ENV requirements.txt
 	pip install -e .  # install the duplicates package locally
 
 TESTS: CHECK_ENV
-	nosetests
+	nosetests --with-coverage --cover-package=duplicates
 
 FLAKE8: CHECK_ENV
 	flake8

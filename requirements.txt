@@ -4,3 +4,4 @@ schema==0.3.1
 flake8==2.3.0
 flake8-blind-except==0.1.0
 flake8-import-order==0.5.1
+coverage==3.7.1

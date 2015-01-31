@@ -109,9 +109,6 @@ class FileAttrFactory(object):
 
     filesAttr = {}
 
-    def __init__(self):
-        super(FileAttrFactory, self).__init__()
-
     @classmethod
     def by_pathname(cls, pathname):
         abs_pathname = absolute_path(pathname)

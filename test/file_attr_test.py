@@ -2,10 +2,11 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import os
 import unittest
 
 from duplicates.file_attr import FileAttr, FileAttrFactory, FileNotFoundError
-from nose.tools import eq_, raises
+from nose.tools import eq_, ok_, raises
 
 TEST_FILE = './test/files/empty file.exe.test'
 MD5 = 'd41d8cd98f00b204e9800998ecf8427e'
@@ -41,6 +42,12 @@ class FileAttrTest(unittest.TestCase):
 
     def test_size(self):
         eq_(self.file_attr.size, 0)
+
+    def test_directory(self):
+        ok_(os.path.isdir(self.file_attr.directory))
+
+    def test_filename(self):
+        eq_(self.file_attr.filename, 'empty file.exe.test')
 
     def test_extention(self):
         eq_(self.file_attr.extention, '.test')

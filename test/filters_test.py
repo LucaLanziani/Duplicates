@@ -3,9 +3,19 @@ from __future__ import (absolute_import, division, print_function,
 
 import unittest
 
-from duplicates.filters import UnixShellWildcardsFilter
+from duplicates.filters import BaseFilter, UnixShellWildcardsFilter
 
-from nose.tools import eq_
+from nose.tools import eq_, raises
+
+
+class BaseFilterTest(unittest.TestCase):
+
+    def setUp(self):
+        self.filter = BaseFilter()
+
+    @raises(NotImplementedError)
+    def test_match(self):
+        self.filter.match('')
 
 
 class UnixShellWildcardsFilterTest(unittest.TestCase):

@@ -107,6 +107,9 @@ class FileStore(object):
             self._rename_key(data, *conversion)
         return data
 
+    def _absolute_pathname(self, local_pathname):
+        return os.path.normpath(os.path.join(self._base_dir, local_pathname))
+
     def add_file(self, file_attr):
         if not self.is_file_known(file_attr):
             self._add_file(file_attr)
@@ -151,9 +154,11 @@ class FileStore(object):
         self._data = data
 
     def save(self):
-        self._data[KNOWN_PATHNAMES_HASHES] = list(self.known_pathnames_hashes)
-        self._data[LAST_UPDATE] = serialize_date(datetime.utcnow())
-        self._to_json(self._data)
+        self._data[LAST_UPDATE] = datetime.utcnow()
+        data = self._data.copy()
+        data[KNOWN_PATHNAMES_HASHES] = list(data[KNOWN_PATHNAMES_HASHES])
+        data[LAST_UPDATE] = serialize_date(data[LAST_UPDATE])
+        self._to_json(data)
 
     def _remove_pathname(self, local_pathname):
         local_pathname_hash = FileAttr.hash_pathname(local_pathname)
@@ -170,7 +175,7 @@ class FileStore(object):
     def duplicates(self):
         for _, paths in self.hash_to_pathnames.iteritems():
             if len(paths) > 1:
-                yield map(lambda path: absolute_path(path), paths)
+                yield map(lambda path: self._absolute_pathname(path), paths)
 
     def __repr__(self):
         return repr(self._data)

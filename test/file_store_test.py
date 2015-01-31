@@ -4,14 +4,17 @@ from __future__ import (absolute_import, division, print_function,
 
 import os
 import unittest
+from datetime import datetime, timedelta
 
-from duplicates.data_store import FILESTORE, FileStore
+from duplicates.data_store import FileStore, FILESTORE
 from duplicates.file_attr import FileAttr
 from duplicates.utils import absolute_path
-from nose.tools import eq_
+from nose.tools import eq_, ok_
 
 TEST_DIR = './test/files/'
-TEST_FILE = './test/files/empty file.exe.test'
+TEST_FILE = '%sempty file.exe.test' % TEST_DIR
+UNICODE_PATHNAME = '%s03_Руководство_по_эксплуатации.jpg' % TEST_DIR
+BIGGER_FILE = '%stestfile_10MB' % TEST_DIR
 
 FILESTORE_PATH = os.path.join(os.path.abspath(TEST_DIR), FILESTORE)
 
@@ -85,3 +88,23 @@ class FileStoreTest(unittest.TestCase):
         self.store._to_json = to_json
         self.store.load()
         self.store.save()
+
+    def test_duplicates(self):
+        empty_file = FileAttr(TEST_FILE)
+        unicode_file = FileAttr(UNICODE_PATHNAME)
+        self.store.add_file(empty_file)
+        self.store.add_file(unicode_file)
+        self.store.add_file(FileAttr(BIGGER_FILE))
+        eq_(list(self.store.duplicates()), [
+            [empty_file.pathname, unicode_file.pathname]
+        ])
+
+    def test_last_update(self):
+        def to_json(data):
+            pass
+
+        eq_(self.store.last_update, datetime(1970, 1, 1))
+        self.store.add_file(self.file_attr)
+        self.store._to_json = to_json
+        self.store.save()
+        ok_(datetime.utcnow() - self.store.last_update < timedelta(seconds=1))

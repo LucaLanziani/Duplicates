@@ -3,9 +3,8 @@ from __future__ import (absolute_import, division, print_function,
 
 import unittest
 
-from nose.tools import eq_
-
 from duplicates.main import Duplicates
+from nose.tools import eq_
 
 TEST_DIR = './test/files/'
 
@@ -17,4 +16,4 @@ class DuplicatesTest(unittest.TestCase):
 
     def test_collect_data(self):
         result = self.duplicates.collect_data()
-        eq_(len(result), 2)
+        eq_(len(result), 3)

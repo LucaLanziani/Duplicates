@@ -21,7 +21,7 @@ class DirectoryTest(unittest.TestCase):
         eq_(self._dir.pathname, os.path.abspath('./test/files'))
 
     def test_dir_content(self):
-        eq_(len(list(self._dir.dir_content())), 2)
+        eq_(len(list(self._dir.dir_content())), 3)
 
     def test_dir_content_filter(self):
         def pathname_filter(pathname):

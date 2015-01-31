@@ -16,14 +16,6 @@ def absolute_path(directory):
     return os.path.abspath(directory)
 
 
-def print_file_content():
-    with open('./test/.duplicates.json.gz') as fd:
-        content = fd.read(1)
-        while len(content) > 0:
-            print("%x %s", content, type(content))
-            content = fd.read(1)
-
-
 def serialize_date(date):
     return date.strftime(DATE_FORMAT)
 
@@ -33,7 +25,3 @@ def deserialize_date(str_date):
 
 
 epoch = datetime(*EPOCH)
-
-
-if __name__ == '__main__':
-    print_file_content()

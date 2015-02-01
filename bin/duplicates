@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from duplicates.main import CommandLineInterface
+from duplicates.command_line_interface import CommandLineInterface
 
 if __name__ == '__main__':
     CommandLineInterface().run(__file__)

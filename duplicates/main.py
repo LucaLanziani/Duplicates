@@ -26,7 +26,7 @@ class Duplicates():
             self.output = ConsoleOutput()
         if not unix_patterns:
             unix_patterns = ['*']
-        self._unixpatterns_filter = UnixShellWildcardsFilter(unix_patterns)
+        self._unixpatterns_filter = UnixShellWildcardsFilter(*unix_patterns)
 
     def _print_state(self, signum, stack):
         analized = len(self._store)

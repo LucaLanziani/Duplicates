@@ -20,7 +20,7 @@ class UnixShellWildcardsFilter(BaseFilter):
     for Unix shell-style wildcards
     """
 
-    def __init__(self, patterns):
+    def __init__(self, *patterns):
         super(UnixShellWildcardsFilter, self).__init__()
         self._patterns = patterns
 

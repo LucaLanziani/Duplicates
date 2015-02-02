@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function,
 import sys
 
 
-class DummyOutput():
+class DummyOutput(object):
 
     def __init__(self):
         pass
@@ -17,7 +17,7 @@ class DummyOutput():
         pass
 
 
-class ConsoleOutput(object):
+class ConsoleOutput(DummyOutput):
     """Report the status of process in the terminal"""
     def __init__(self):
         super(ConsoleOutput, self).__init__()

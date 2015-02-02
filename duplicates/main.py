@@ -12,7 +12,7 @@ from duplicates.filters import UnixShellWildcardsFilter
 from duplicates.output import ConsoleOutput, DummyOutput
 
 
-class Duplicates():
+class Duplicates(object):
 
     def __init__(self, directory, verbose=False, unix_patterns=None):
         self._settings(verbose, unix_patterns)

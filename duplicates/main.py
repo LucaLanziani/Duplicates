@@ -9,28 +9,28 @@ from duplicates.data_store import FileStore
 from duplicates.directory import Directory
 from duplicates.file_attr import FileAttrFactory
 from duplicates.filters import UnixShellWildcardsFilter
-from duplicates.output import ConsoleOutput, DummyOutput
+from duplicates.output import DummyOutput
 
 
 class Duplicates(object):
 
-    def __init__(self, directory, verbose=False, unix_patterns=None):
-        self._settings(verbose, unix_patterns)
+    def __init__(self, directory, output=None, unix_patterns=None):
+        self._settings(output, unix_patterns)
         self._directory = Directory(directory)
         self._store = FileStore(self._directory.pathname)
         self._pathname_sha_cache = {}
 
-    def _settings(self, verbose, unix_patterns):
-        self.output = DummyOutput()
-        if verbose:
-            self.output = ConsoleOutput()
+    def _settings(self, output, unix_patterns):
+        self.output = output
+        if self.output is None:
+            self.output = DummyOutput()
         if not unix_patterns:
             unix_patterns = ['*']
         self._unixpatterns_filter = UnixShellWildcardsFilter(*unix_patterns)
 
-    def _print_state(self, signum, stack):
+    def _progress(self, signum, stack):
         analized = len(self._store)
-        self.output.status(analized, self._filtered, self._total_files)
+        self.output.progress(analized, self._filtered, self._total_files)
 
     def _get_file_number(self):
         self._content = list(self._directory.dir_content())
@@ -52,6 +52,10 @@ class Duplicates(object):
         for pathname in content:
             yield pathname
 
+    @property
+    def store_path(self):
+        return self._store.store_path
+
     def collect_data(self):
         """
         Collect files data and return the store object
@@ -59,12 +63,20 @@ class Duplicates(object):
         self._get_file_number()
         for pathname in self._file_list():
             self._store.add_file(FileAttrFactory.by_pathname(pathname))
-            self._print_state(None, None)
+            self._progress(None, None)
         self.output.print()
         return self._store
+
+    def print_duplicates(self):
+        for duplicates in self._store.duplicates():
+            self.output.print('\t'.join(duplicates))
+
+    def print_content(self):
+        for filepath in self._file_list():
+            self.output.print(filepath)
 
     def run(self, store=True):
         data = self.collect_data()
         if store:
             data.save()
-        return data
+        return self

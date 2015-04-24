@@ -181,4 +181,4 @@ class FileStore(object):
         return repr(self._data)
 
     def __len__(self):
-        return len(self._data[KNOWN_PATHNAMES_HASHES])
+        return len(self.known_pathnames_hashes)

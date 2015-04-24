@@ -4,6 +4,7 @@ from __future__ import (absolute_import, division, print_function,
 import os
 import unittest
 
+from duplicates.data_store import FILESTORE
 from duplicates.main import Duplicates
 from nose.tools import eq_, ok_
 
@@ -20,15 +21,13 @@ class DuplicatesTest(unittest.TestCase):
         eq_(len(result), 3)
 
     def test_run_no_store(self):
-        store = self.duplicates.run(store=False)
-        store_file = store.store_path
-        ok_(not os.path.isfile(store_file), "%s should not exist" % store_file)
+        self.duplicates.run(store=False)
+        ok_(not os.path.isfile(self.duplicates.store_path), "%s should not exist" % FILESTORE)
 
     def test_run_with_store(self):
-        store = self.duplicates.run()
-        store_file = store.store_path
-        ok_(os.path.isfile(store_file), "something went wrong saving the data")
-        os.remove(store_file)
+        self.duplicates.run()
+        ok_(os.path.isfile(self.duplicates.store_path), "something went wrong saving the data")
+        os.remove(self.duplicates.store_path)
 
     def test_empty_unix_patters(self):
         duplicates = Duplicates(TEST_DIR, unix_patterns=[])

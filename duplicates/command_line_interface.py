@@ -7,18 +7,21 @@ import os
 
 from docopt import docopt
 from duplicates.main import Duplicates
+from duplicates.output import ConsoleOutput
 from schema import And, Optional, Schema, SchemaError
 
 
 class CommandLineInterface(object):
     """Usage: %(name)s [options] DIRECTORY [PATTERNS...]
 
-    You can filter the analyzed files passing multiple patterns through command
+    You can filter the analysed files passing multiple patterns through command
     line, the patterns can include "Unix shell-style wildcards"
 
     Options:
-        --verbose         print status update in console
-        --no-store        do not save the gathered information on filesystem
+        --show-content      print all the files analysed
+        --show-duplicates   print files that have duplicates, duplicates path are separated by tabs
+        --progress          print progress update in console
+        --no-store          do not save the gathered information on filesystem
 
     Examples:
         %(name)s .                  # every file
@@ -32,7 +35,9 @@ class CommandLineInterface(object):
     def _validate_args(self, opt):
         schema = Schema({
             'DIRECTORY': And(os.path.exists, error="Dir does not exists"),
-            Optional('--verbose'): bool,
+            Optional('--show-content'): bool,
+            Optional('--show-duplicates'): bool,
+            Optional('--progress'): bool,
             Optional('--no-store'): bool,
             Optional('PATTERNS'): [str]
         })
@@ -51,11 +56,18 @@ class CommandLineInterface(object):
 
     def run(self, name=None):
         opt = self._parse_args(name)
-        Duplicates(
+
+        duplicates = Duplicates(
             opt['DIRECTORY'],
-            verbose=opt['--verbose'],
+            output=ConsoleOutput(opt['--show-content'] or opt['--show-duplicates'], opt['--progress']),
             unix_patterns=opt['PATTERNS']
         ).run(not opt['--no-store'])
+
+        if opt['--show-content']:
+            duplicates.print_content()
+
+        if opt['--show-duplicates']:
+            duplicates.print_duplicates()
 
 if __name__ == '__main__':
     CommandLineInterface().run()

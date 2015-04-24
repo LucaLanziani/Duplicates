@@ -5,12 +5,16 @@ from __future__ import (absolute_import, division, print_function,
 import sys
 
 
+def noop(*args, **kwdargs):
+    pass
+
+
 class DummyOutput(object):
 
-    def __init__(self):
+    def __init__(self, *args, **kwdargs):
         pass
 
-    def status(self, *args):
+    def progress(self, *args):
         pass
 
     def print(self, *args, **kwdargs):
@@ -19,10 +23,16 @@ class DummyOutput(object):
 
 class ConsoleOutput(DummyOutput):
     """Report the status of process in the terminal"""
-    def __init__(self):
-        super(ConsoleOutput, self).__init__()
+    def __init__(self, output, progress, **kwdargs):
+        super(ConsoleOutput, self).__init__(output, progress, **kwdargs)
 
-    def status(self, analized, filtered, total):
+        if not output:
+            self.print = noop
+
+        if not progress:
+            self.progress = noop
+
+    def progress(self, analized, filtered, total):
         percentage = 0
         if analized > 0:
             percentage = 100 / (filtered / analized)

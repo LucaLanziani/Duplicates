@@ -5,10 +5,10 @@ from __future__ import (absolute_import, division, print_function,
 
 import os
 
-from duplicates.utils import absolute_path
+from duplicates.utils import absolute_path, DuplicateExceptions
 
 
-class DirNotFoundError(Exception):
+class DirNotFoundError(DuplicateExceptions):
     pass
 
 

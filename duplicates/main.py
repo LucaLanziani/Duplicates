@@ -5,19 +5,21 @@ from __future__ import (absolute_import, division, print_function,
 
 import os
 
-from duplicates.data_store import FileStore
-from duplicates.directory import Directory
-from duplicates.file_attr import FileAttrFactory
 from duplicates.filters import UnixShellWildcardsFilter
+from duplicates.fs.directory import Directory
+from duplicates.fs.file_attr import FileAttrFactory
 from duplicates.output import DummyOutput
+from duplicates.store.inmemory_store import InmemoryStore
 
 
 class Duplicates(object):
 
-    def __init__(self, directory, output=None, unix_patterns=None):
+    def __init__(self, directory, output=None, unix_patterns=None, store=None):
+        if store is None:
+            store = InmemoryStore
         self._settings(output, unix_patterns)
         self._directory = Directory(directory)
-        self._store = FileStore(self._directory.pathname)
+        self._store = store()
         self._pathname_sha_cache = {}
 
     def _settings(self, output, unix_patterns):
@@ -52,10 +54,6 @@ class Duplicates(object):
         for pathname in content:
             yield pathname
 
-    @property
-    def store_path(self):
-        return self._store.store_path
-
     def collect_data(self):
         """
         Collect files data and return the store object
@@ -68,7 +66,7 @@ class Duplicates(object):
         return self._store
 
     def print_duplicates(self):
-        for duplicates in self._store.duplicates():
+        for duplicates in self._store.duplicate_pathnames():
             self.output.print('\t'.join(duplicates))
 
     def print_content(self):

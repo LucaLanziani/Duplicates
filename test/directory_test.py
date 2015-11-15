@@ -4,7 +4,8 @@ from __future__ import (absolute_import, division, print_function,
 import os
 import unittest
 
-from duplicates.directory import Directory, DirNotFoundError
+
+from duplicates.fs.directory import Directory, DirNotFoundError
 from nose.tools import assert_greater, eq_, raises
 
 

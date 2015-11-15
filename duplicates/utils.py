@@ -7,6 +7,11 @@ from datetime import datetime
 
 EPOCH = (1970, 1, 1)
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
+APPNAME = 'duplicates'
+
+
+class DuplicateExceptions(Exception):
+    pass
 
 
 def absolute_path(directory):

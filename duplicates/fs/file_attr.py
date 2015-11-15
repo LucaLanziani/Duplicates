@@ -6,12 +6,12 @@ import hashlib
 import os
 import stat
 
-from duplicates.utils import absolute_path
+from duplicates.utils import absolute_path, DuplicateExceptions
 
 BLOCKSIZE = 65536
 
 
-class FileNotFoundError(Exception):
+class FileNotFoundError(DuplicateExceptions):
     pass
 
 

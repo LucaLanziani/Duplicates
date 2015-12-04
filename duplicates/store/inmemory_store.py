@@ -102,10 +102,9 @@ class InmemoryStore(DummyStore):
     def remove_pathname(self, pathname):
         self._remove_pathname(pathname)
 
-    def duplicate_pathnames(self):
-        for _, paths in self._hash_to_pathnames.iteritems():
-            if len(paths) > 1:
-                yield map(lambda path: path, paths)
+    def paths_by_hash(self):
+        for hash, paths in self._hash_to_pathnames.iteritems():
+            yield hash, paths
 
     def __repr__(self):
         return repr(self._data)

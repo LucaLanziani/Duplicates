@@ -12,7 +12,7 @@ from duplicates.output import DummyOutput
 from duplicates.store.inmemory_store import InmemoryStore
 
 
-class Duplicates(object):
+class Gatherer(object):
 
     def __init__(self, directory, output=None, unix_patterns=None, store=None):
         if store is None:
@@ -34,7 +34,7 @@ class Duplicates(object):
         analized = len(self._store)
         self.output.progress(analized, self._filtered, self._total_files)
 
-    def _get_file_number(self):
+    def _count_files(self):
         self._content = list(self._directory.dir_content())
         self._total_files = len(self._content)
         self._filtered = len(filter(self._valid_pathname, self._content))
@@ -47,7 +47,7 @@ class Duplicates(object):
                 self._unixpatterns_filter.match(pathname))
         )
 
-    def _file_list(self):
+    def _pathnames(self):
         content = self._directory.dir_content(
             pathname_filter=self._valid_pathname
         )
@@ -58,19 +58,20 @@ class Duplicates(object):
         """
         Collect files data and return the store object
         """
-        self._get_file_number()
-        for pathname in self._file_list():
+        self._count_files()
+        for pathname in self._pathnames():
             self._store.add_file(FileAttrFactory.by_pathname(pathname))
             self._progress(None, None)
         self.output.print()
         return self._store
 
     def print_duplicates(self):
-        for duplicates in self._store.duplicate_pathnames():
-            self.output.print('\t'.join(duplicates))
+        for _, duplicates in self._store.paths_by_hash():
+            if len(duplicates) > 1:
+                self.output.print('\t'.join(duplicates))
 
     def print_content(self):
-        for filepath in self._file_list():
+        for filepath in self._pathnames():
             self.output.print(filepath)
 
     def run(self, store=True):

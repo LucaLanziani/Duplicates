@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function,
 import os
 
 from docopt import docopt
-from duplicates.main import Duplicates
+from duplicates.main import Gatherer
 from duplicates.output import ConsoleOutput
 from schema import And, Optional, Schema, SchemaError
 
@@ -56,17 +56,17 @@ class CommandLineInterface(object):
     def run(self, name=None):
         opt = self._parse_args(name)
 
-        duplicates = Duplicates(
+        gatherer = Gatherer(
             opt['DIRECTORY'],
             output=ConsoleOutput(opt['--show-content'] or opt['--show-duplicates'], opt['--progress']),
             unix_patterns=opt['PATTERNS']
         ).run(not opt['--no-store'])
 
         if opt['--show-content']:
-            duplicates.print_content()
+            gatherer.print_content()
 
         if opt['--show-duplicates']:
-            duplicates.print_duplicates()
+            gatherer.print_duplicates()
 
 if __name__ == '__main__':
     CommandLineInterface().run()

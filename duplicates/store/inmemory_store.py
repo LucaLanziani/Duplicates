@@ -6,8 +6,8 @@ import logging
 import os
 
 from duplicates.fs.file_attr import FileAttr
+from duplicates.lib.utils import (epoch, serialize_date)
 from duplicates.store.dummy_store import DummyStore
-from duplicates.utils import (epoch, serialize_date)
 
 FILESTORE = ".duplicates.json.gz"
 KNOWN_PATHNAMES_HASHES = 'known_pathnames_hashes'

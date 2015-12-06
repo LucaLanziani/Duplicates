@@ -3,7 +3,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import unittest
 
-from duplicates.main import Gatherer
+from duplicates.gatherer import Gatherer
 from nose.tools import eq_
 
 TEST_DIR = './test/files/'

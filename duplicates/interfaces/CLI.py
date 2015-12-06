@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
+
 import logging
 import os
 
 from docopt import docopt
 from duplicates import start_logger
-from duplicates.main import Gatherer
-from duplicates.output import ConsoleOutput
+from duplicates.gatherer import Gatherer
+from duplicates.lib.output import ConsoleOutput
 from schema import And, Optional, Or, Schema, SchemaError
 
 log = logging.getLogger(__name__)

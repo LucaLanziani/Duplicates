@@ -6,10 +6,10 @@ from __future__ import (absolute_import, division, print_function,
 import logging
 import os
 
-from duplicates.filters import UnixShellWildcardsFilter
 from duplicates.fs.directory import Directory
 from duplicates.fs.file_attr import FileAttrFactory
-from duplicates.output import DummyOutput
+from duplicates.lib.filters import UnixShellWildcardsFilter
+from duplicates.lib.output import DummyOutput
 from duplicates.store.inmemory_store import InmemoryStore
 
 log = logging.getLogger(__name__)

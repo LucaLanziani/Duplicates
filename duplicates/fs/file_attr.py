@@ -4,10 +4,11 @@ from __future__ import (absolute_import, division, print_function,
 
 import hashlib
 import logging
+
 import os
 import stat
 
-from duplicates.utils import absolute_path, DuplicateExceptions
+from duplicates.lib.utils import absolute_path, DuplicateExceptions
 
 BLOCKSIZE = 65536
 

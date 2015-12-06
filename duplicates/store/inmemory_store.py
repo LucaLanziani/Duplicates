@@ -2,6 +2,7 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import logging
 import os
 
 from duplicates.fs.file_attr import FileAttr
@@ -18,6 +19,8 @@ LMTIME = 'lmtime'
 HASH = 'hash'
 PATHNAME = 'pathname'
 LAST_UPDATE = 'updated'
+
+log = logging.getLogger(__name__)
 
 
 class InmemoryStore(DummyStore):
@@ -58,7 +61,9 @@ class InmemoryStore(DummyStore):
         return abs_pathname.replace(self._base_dir, '.')
 
     def _absolute_pathname(self, local_pathname):
-        return os.path.normpath(os.path.join(self._base_dir, local_pathname))
+        abs_pathname = os.path.normpath(os.path.join(self._base_dir, local_pathname))
+        log.debug('Absolute pathname for %s: %s', local_pathname, abs_pathname)
+        return abs_pathname
 
     def _add_file(self, file_attr):
         pathname = file_attr.pathname
@@ -72,11 +77,12 @@ class InmemoryStore(DummyStore):
             HASH: file_attr.hash,
             PATHNAME: pathname
         }
+        log.debug('Adding %s to the store', pathname)
         self._known_pathnames_hashes.add(pathname_hash)
 
     def _remove_pathname(self, pathname):
+        log.debug('Removing %s from the store', pathname)
         pathname_hash = FileAttr.hash_pathname(pathname)
-
         self._known_pathnames_hashes.remove(pathname_hash)
         stored_data = self._pathname_hash_to_attr[pathname_hash]
         self._hash_to_pathnames[stored_data[HASH]].remove(stored_data[PATHNAME])

@@ -3,6 +3,7 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import logging
 import os
 
 from duplicates.filters import UnixShellWildcardsFilter
@@ -11,28 +12,31 @@ from duplicates.fs.file_attr import FileAttrFactory
 from duplicates.output import DummyOutput
 from duplicates.store.inmemory_store import InmemoryStore
 
+log = logging.getLogger(__name__)
+
 
 class Gatherer(object):
 
     def __init__(self, directory, output=None, unix_patterns=None, store=None):
-        if store is None:
-            store = InmemoryStore
-        self._settings(output, unix_patterns)
+        self._settings(output, unix_patterns, store)
         self._directory = Directory(directory)
-        self._store = store()
         self._pathname_sha_cache = {}
 
-    def _settings(self, output, unix_patterns):
-        self.output = output
-        if self.output is None:
-            self.output = DummyOutput()
+    def _settings(self, output, unix_patterns, store):
+        if store is None:
+            store = InmemoryStore
+        if output is None:
+            output = DummyOutput()
         if not unix_patterns:
             unix_patterns = ['*']
+
+        self._output = output
+        self._store = store()
         self._unixpatterns_filter = UnixShellWildcardsFilter(*unix_patterns)
 
     def _progress(self, signum, stack):
         analized = len(self._store)
-        self.output.progress(analized, self._filtered, self._total_files)
+        self._output.progress(analized, self._filtered, self._total_files)
 
     def _count_files(self):
         self._content = list(self._directory.dir_content())
@@ -62,17 +66,17 @@ class Gatherer(object):
         for pathname in self._pathnames():
             self._store.add_file(FileAttrFactory.by_pathname(pathname))
             self._progress(None, None)
-        self.output.print()
+        self._output.print()
         return self._store
 
     def print_duplicates(self):
         for _, duplicates in self._store.paths_by_hash():
             if len(duplicates) > 1:
-                self.output.print('\t'.join(duplicates))
+                self._output.print('\t'.join(duplicates))
 
     def print_content(self):
         for filepath in self._pathnames():
-            self.output.print(filepath)
+            self._output.print(filepath)
 
     def run(self, store=True):
         data = self.collect_data()

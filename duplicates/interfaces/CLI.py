@@ -9,7 +9,7 @@ import os
 from docopt import docopt
 from duplicates import start_logger
 from duplicates.gatherer import Gatherer
-from duplicates.lib.output import ConsoleOutput
+from duplicates.libraries.output import ConsoleOutput
 from schema import And, Optional, Or, Schema, SchemaError
 
 log = logging.getLogger(__name__)

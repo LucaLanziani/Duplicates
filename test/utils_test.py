@@ -5,7 +5,7 @@ import os
 import unittest
 from datetime import datetime
 
-from duplicates.lib.utils import absolute_path, deserialize_date, serialize_date
+from duplicates.libraries.utils import absolute_path, deserialize_date, serialize_date
 from nose.tools import eq_
 
 DATE_TIME = '1970-01-01T00:00:00.000000Z'

@@ -3,7 +3,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import unittest
 
-from duplicates.lib.filters import BaseFilter, UnixShellWildcardsFilter
+from duplicates.libraries.filters import BaseFilter, UnixShellWildcardsFilter
 from nose.tools import eq_, raises
 
 

@@ -8,7 +8,7 @@ import logging
 import os
 import stat
 
-from duplicates.lib.utils import absolute_path, DuplicateExceptions
+from duplicates.libraries.utils import absolute_path, DuplicateExceptions
 
 BLOCKSIZE = 65536
 

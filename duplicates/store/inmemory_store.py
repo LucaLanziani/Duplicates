@@ -6,7 +6,7 @@ import logging
 import os
 
 from duplicates.fs.file_attr import FileAttr
-from duplicates.lib.utils import (epoch, serialize_date)
+from duplicates.libraries.utils import (epoch, serialize_date)
 from duplicates.store.dummy_store import DummyStore
 
 FILESTORE = ".duplicates.json.gz"

@@ -4,7 +4,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import os
 
-from duplicates.lib.utils import absolute_path, DuplicateExceptions
+from duplicates.libraries.utils import absolute_path, DuplicateExceptions
 
 
 class DirNotFoundError(DuplicateExceptions):

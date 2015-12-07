@@ -1,5 +1,5 @@
 # Duplicates
 
-![Build result](https://travis-ci.org/Nss/Duplicates.svg?branch=master)
+![Build result](https://travis-ci.org/LucaLanziani/Duplicates.svg?branch=master)
 
 Find duplicate files in a directory

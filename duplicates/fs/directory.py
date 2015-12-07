@@ -2,13 +2,12 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
-
 import os
 
-from duplicates.utils import absolute_path
+from duplicates.libraries.utils import absolute_path, DuplicateExceptions
 
 
-class DirNotFoundError(Exception):
+class DirNotFoundError(DuplicateExceptions):
     pass
 
 

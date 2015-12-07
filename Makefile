@@ -22,3 +22,6 @@ TESTS: CHECK_ENV
 
 FLAKE8: CHECK_ENV
 	flake8
+
+IPYTHON:
+	python -c 'import IPython; IPython.terminal.ipapp.launch_new_instance()'

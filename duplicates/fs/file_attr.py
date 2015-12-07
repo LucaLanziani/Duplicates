@@ -3,23 +3,36 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import hashlib
+import logging
+
 import os
 import stat
 
-from duplicates.utils import absolute_path
+from duplicates.libraries.utils import absolute_path, DuplicateExceptions
 
 BLOCKSIZE = 65536
 
+log = logging.getLogger(__name__)
 
-class FileNotFoundError(Exception):
+
+class FileNotFoundError(DuplicateExceptions):
     pass
 
 
 def cache_result(func):
+    """
+    Decorator to cache the return value of a give function
+
+    :param func:
+    :return: return the cached value returned by the given function
+    """
+
     def _decorator(self, *args, **kwargs):
         key = func.__name__
         try:
-            return self._cached[key]
+            value = self._cached[key]
+            log.debug('Return the cached value of %s', key)
+            return value
         except KeyError:
             self._cached[key] = func(self, *args, **kwargs)
             return self._cached[key]
@@ -36,6 +49,7 @@ class FileAttr(object):
         self._cached = {}
 
     def _hash(self, hash_function=hashlib.md5):
+        log.debug('Hashing %s using %s algorithm', self._abs_pathname, hash_function.__name__)
         filehash = hash_function()
         with open(self._abs_pathname, 'rb') as fp:
             buf = fp.read(BLOCKSIZE)

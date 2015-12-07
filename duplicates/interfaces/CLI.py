@@ -3,12 +3,16 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import logging
 import os
 
 from docopt import docopt
-from duplicates.main import Duplicates
-from duplicates.output import ConsoleOutput
-from schema import And, Optional, Schema, SchemaError
+from duplicates import start_logger
+from duplicates.gatherer import Gatherer
+from duplicates.libraries.output import ConsoleOutput
+from schema import And, Optional, Or, Schema, SchemaError
+
+log = logging.getLogger(__name__)
 
 
 class CommandLineInterface(object):
@@ -18,10 +22,11 @@ class CommandLineInterface(object):
     line, the patterns can include "Unix shell-style wildcards"
 
     Options:
-        --show-content      print all the files analysed
-        --show-duplicates   print files that have duplicates, duplicates path are separated by tabs
-        --progress          print progress update in console
-        --no-store          do not save the gathered information on filesystem
+        --show-content          print all the files analysed
+        --show-duplicates       print files that have duplicates, duplicates path are separated by tabs
+        --progress              print progress update in console
+        --no-store              do not save the gathered information on filesystem
+        --log-level=<LEVEL>     process debug level [default: CRITICAL]
 
     Examples:
         %(name)s .                  # every file
@@ -39,7 +44,8 @@ class CommandLineInterface(object):
             Optional('--show-duplicates'): bool,
             Optional('--progress'): bool,
             Optional('--no-store'): bool,
-            Optional('PATTERNS'): [str]
+            Optional('--log-level'): Or(unicode, str),
+            Optional('PATTERNS'): [Or(unicode, str)]
         })
         try:
             opt = schema.validate(opt)
@@ -55,19 +61,23 @@ class CommandLineInterface(object):
         return self._validate_args(opt)
 
     def run(self, name=None):
-        opt = self._parse_args(name)
+        try:
+            opt = self._parse_args(name)
+            start_logger(opt['--log-level'])
+            gatherer = Gatherer(
+                opt['DIRECTORY'],
+                output=ConsoleOutput(opt['--show-content'] or opt['--show-duplicates'], opt['--progress']),
+                unix_patterns=opt['PATTERNS']
+            ).run(not opt['--no-store'])
 
-        duplicates = Duplicates(
-            opt['DIRECTORY'],
-            output=ConsoleOutput(opt['--show-content'] or opt['--show-duplicates'], opt['--progress']),
-            unix_patterns=opt['PATTERNS']
-        ).run(not opt['--no-store'])
+            if opt['--show-content']:
+                gatherer.print_content()
 
-        if opt['--show-content']:
-            duplicates.print_content()
+            if opt['--show-duplicates']:
+                gatherer.print_duplicates()
 
-        if opt['--show-duplicates']:
-            duplicates.print_duplicates()
+        except KeyboardInterrupt:
+            log.exception('Exiting on CTRL^C')
 
 if __name__ == '__main__':
     CommandLineInterface().run()

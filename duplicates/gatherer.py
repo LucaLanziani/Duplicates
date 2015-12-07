@@ -3,36 +3,42 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import logging
 import os
 
-from duplicates.data_store import FileStore
-from duplicates.directory import Directory
-from duplicates.file_attr import FileAttrFactory
-from duplicates.filters import UnixShellWildcardsFilter
-from duplicates.output import DummyOutput
+from duplicates.fs.directory import Directory
+from duplicates.fs.file_attr import FileAttrFactory
+from duplicates.libraries.filters import UnixShellWildcardsFilter
+from duplicates.libraries.output import DummyOutput
+from duplicates.store.inmemory_store import InmemoryStore
+
+log = logging.getLogger(__name__)
 
 
-class Duplicates(object):
+class Gatherer(object):
 
-    def __init__(self, directory, output=None, unix_patterns=None):
-        self._settings(output, unix_patterns)
+    def __init__(self, directory, output=None, unix_patterns=None, store=None):
+        self._settings(output, unix_patterns, store)
         self._directory = Directory(directory)
-        self._store = FileStore(self._directory.pathname)
         self._pathname_sha_cache = {}
 
-    def _settings(self, output, unix_patterns):
-        self.output = output
-        if self.output is None:
-            self.output = DummyOutput()
+    def _settings(self, output, unix_patterns, store):
+        if store is None:
+            store = InmemoryStore
+        if output is None:
+            output = DummyOutput()
         if not unix_patterns:
             unix_patterns = ['*']
+
+        self._output = output
+        self._store = store()
         self._unixpatterns_filter = UnixShellWildcardsFilter(*unix_patterns)
 
     def _progress(self, signum, stack):
         analized = len(self._store)
-        self.output.progress(analized, self._filtered, self._total_files)
+        self._output.progress(analized, self._filtered, self._total_files)
 
-    def _get_file_number(self):
+    def _count_files(self):
         self._content = list(self._directory.dir_content())
         self._total_files = len(self._content)
         self._filtered = len(filter(self._valid_pathname, self._content))
@@ -45,35 +51,32 @@ class Duplicates(object):
                 self._unixpatterns_filter.match(pathname))
         )
 
-    def _file_list(self):
+    def _pathnames(self):
         content = self._directory.dir_content(
             pathname_filter=self._valid_pathname
         )
         for pathname in content:
             yield pathname
 
-    @property
-    def store_path(self):
-        return self._store.store_path
-
     def collect_data(self):
         """
         Collect files data and return the store object
         """
-        self._get_file_number()
-        for pathname in self._file_list():
+        self._count_files()
+        for pathname in self._pathnames():
             self._store.add_file(FileAttrFactory.by_pathname(pathname))
             self._progress(None, None)
-        self.output.print()
+        self._output.print()
         return self._store
 
     def print_duplicates(self):
-        for duplicates in self._store.duplicates():
-            self.output.print('\t'.join(duplicates))
+        for _, duplicates in self._store.paths_by_hash():
+            if len(duplicates) > 1:
+                self._output.print('\t'.join(duplicates))
 
     def print_content(self):
-        for filepath in self._file_list():
-            self.output.print(filepath)
+        for filepath in self._pathnames():
+            self._output.print(filepath)
 
     def run(self, store=True):
         data = self.collect_data()

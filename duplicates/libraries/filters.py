@@ -22,14 +22,14 @@ class UnixShellWildcardsFilter(BaseFilter):
 
     def __init__(self, *patterns):
         super(UnixShellWildcardsFilter, self).__init__()
-        self._patterns = patterns
+        self._patterns = map(lambda pattern: pattern.lower(), patterns)
 
     def _match(self, pathname):
         """
         Return if name matches any of the patterns.
         """
         for pat in self._patterns:
-            if fnmatch(pathname, pat):
+            if fnmatch(pathname.lower(), pat):
                 return True
         return False
 

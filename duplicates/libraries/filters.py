@@ -43,9 +43,9 @@ class UnixShellWildcardsFilter(BaseFilter):
         return self._match(pathname)
 
     def filter_dircontent(self, dircontent):
-        for directory, filepath in dircontent:
+        for filepath, directory in dircontent:
             if self.match(filepath):
-                yield directory, filepath
+                yield filepath, filepath
 
 if __name__ == '__main__':
     assert UnixShellWildcardsFilter('*.jpg').match('sdfbasdfa.txt') == False

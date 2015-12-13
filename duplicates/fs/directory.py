@@ -40,7 +40,7 @@ class Directory(object):
             limit -= 1
             if limit < 0:
                 break
-            yield directory, pathname
+            yield pathname, directory
 
     @classmethod
     @dir_exists

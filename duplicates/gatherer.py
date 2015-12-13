@@ -47,7 +47,7 @@ class Gatherer(object):
     def _count_files(self):
         self._total_files = 0
         self._filtered = 0
-        for directory, filepath in Directory.content(self._directory):
+        for filepath, directory in Directory.content(self._directory):
             self._total_files += 1
             if (self._valid_pathname(filepath)):
                 self._filtered += 1
@@ -65,7 +65,7 @@ class Gatherer(object):
         return self._unixpatterns_filter.filter_dircontent(content)
 
     def _pathnames(self):
-        for _, pathname in self._filtered_content():
+        for pathname, _ in self._filtered_content():
             yield pathname
 
     def collect_data(self):

@@ -116,7 +116,8 @@ class FileAttr(object):
         return os.stat(cls._abs_pathname(pathname))[stat.ST_MTIME]
 
     @classmethod
-    def get(cls, directory, pathname, attributes=()):
+    @file_exists
+    def get(cls, pathname, directory, attributes=()):
         attrs_to_method = cls._attr_to_method()
         attrs = set(attrs_to_method.keys()).intersection(attributes)
         result = {
@@ -131,8 +132,8 @@ class FileAttr(object):
     def attr_generator(cls, dircontent, attributes=None):
         if attributes is None:
             attributes = cls._attr_to_method().keys()
-        for directory, pathname in dircontent:
-            yield cls.get(directory, pathname, attributes=attributes)
+        for pathname, rootDir in dircontent:
+            yield cls.get(pathname, rootDir, attributes=attributes)
 
 if __name__ == '__main__':
     print(FileAttr.get('.', 'setup.py', attributes=('size', 'lmtime')))

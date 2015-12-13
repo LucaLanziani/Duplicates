@@ -26,4 +26,5 @@ class DuplicatesTest(unittest.TestCase):
     def test_asterisk_unix_pattern(self):
         duplicates = Gatherer(TEST_DIR, unix_patterns="*")
         result = duplicates.collect_data()
+        print(result)
         eq_(len(result), 3)

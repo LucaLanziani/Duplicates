@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function,
 import os
 import unittest
 
-from duplicates.fs.file_attr import FileAttr, FileAttrFactory, FileNotFoundError
+from duplicates.fs.file_attr import FileAttr, FileNotFoundError
 from nose.tools import eq_, ok_, raises
 
 TEST_FILE = './test/files/empty file.exe.test'
@@ -18,52 +18,37 @@ UNICODE_PATHNAME = './test/files/03_Руководство_по_эксплуат
 
 class FileAttrTest(unittest.TestCase):
 
-    def setUp(self):
-        self.file_attr = FileAttr(TEST_FILE)
-
     def tearDown(self):
         pass
 
     @raises(FileNotFoundError)
     def test_raise_if_file_not_exist(self):
-        FileAttr(TEST_FILE.replace('test', 'notExists'))
+        FileAttr.get('./notExists', TEST_FILE.replace('test', 'notExists'))
 
     def test_md5(self):
-        eq_(self.file_attr.md5, MD5)
+        eq_(FileAttr._md5(TEST_FILE), MD5)
 
     def test_sha1(self):
-        eq_(self.file_attr.sha1, SHA1)
+        eq_(FileAttr._sha1(TEST_FILE), SHA1)
 
     def test_sha256(self):
-        eq_(self.file_attr.sha256, SHA256)
+        eq_(FileAttr._sha256(TEST_FILE), SHA256)
 
     def test_hash(self):
-        eq_(self.file_attr.hash, MD5)
+        eq_(FileAttr._hash(TEST_FILE), MD5)
 
     def test_size(self):
-        eq_(self.file_attr.size, 0)
+        eq_(FileAttr._size(TEST_FILE), 0)
 
     def test_directory(self):
-        ok_(os.path.isdir(self.file_attr.directory))
+        ok_(os.path.isdir(FileAttr._directory(TEST_FILE)))
 
     def test_filename(self):
-        eq_(self.file_attr.filename, 'empty file.exe.test')
+        eq_(FileAttr._filename(TEST_FILE), 'empty file.exe.test')
 
     def test_extention(self):
-        eq_(self.file_attr.extention, '.test')
-
-    def test_similarity(self):
-        eq_(self.file_attr.similar(self.file_attr), True)
+        eq_(FileAttr._extension(TEST_FILE), '.test')
 
     def test_unicode_filename(self):
-        fa = FileAttr(UNICODE_PATHNAME)
-        eq_(fa.hash_pathname(UNICODE_PATHNAME),
-            '88f781908c7537dcb8b24f294c38b5ccc87ac0481cf203091766ab916a5b510d')
-
-
-class FileAttrFactoryTest(unittest.TestCase):
-
-    def test_by_pathname(self):
-        first = FileAttrFactory.by_pathname(TEST_FILE)
-        second = FileAttrFactory.by_pathname(TEST_FILE)
-        eq_(first, second)
+        ph = FileAttr._pathname_hash(UNICODE_PATHNAME)
+        eq_(ph, '88f781908c7537dcb8b24f294c38b5ccc87ac0481cf203091766ab916a5b510d')

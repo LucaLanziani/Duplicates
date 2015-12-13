@@ -9,6 +9,8 @@ from duplicates.fs.file_attr import FileAttr
 from duplicates.libraries.utils import (epoch, serialize_date)
 from duplicates.store.dummy_store import DummyStore
 
+from munch import Munch
+
 FILESTORE = ".duplicates.json.gz"
 KNOWN_PATHNAMES_HASHES = 'known_pathnames_hashes'
 PATHNAME_HASH_TO_ATTRS = 'pathname_hash_to_attrs'
@@ -66,8 +68,9 @@ class InmemoryStore(DummyStore):
         return abs_pathname
 
     def _add_file(self, file_attr):
+        file_attr = Munch(file_attr)
         pathname = file_attr.pathname
-        pathname_hash = FileAttr.hash_pathname(pathname)
+        pathname_hash = file_attr.pathname_hash
         if file_attr.hash not in self._hash_to_pathnames:
             self._hash_to_pathnames[file_attr.hash] = []
         self._hash_to_pathnames[file_attr.hash].append(pathname)
@@ -93,8 +96,8 @@ class InmemoryStore(DummyStore):
             self._add_file(file_attr)
 
     def is_file_known(self, file_attr):
-        pathname = file_attr.pathname
-        pathname_hash = FileAttr.hash_pathname(pathname)
+        file_attr = Munch(file_attr)
+        pathname_hash = file_attr.pathname_hash
         if pathname_hash not in self._known_pathnames_hashes:
             return False
         else:

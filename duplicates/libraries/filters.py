@@ -23,13 +23,15 @@ class UnixShellWildcardsFilter(BaseFilter):
     def __init__(self, *patterns):
         super(UnixShellWildcardsFilter, self).__init__()
         self._patterns = map(lambda pattern: pattern.lower(), patterns)
+        if not self._patterns:
+            self._patterns.append('*')
 
     def _match(self, pathname):
         """
         Return if name matches any of the patterns.
         """
-        for pat in self._patterns:
-            if fnmatch(pathname.lower(), pat):
+        for pattern in self._patterns:
+            if fnmatch(pathname.lower(), pattern):
                 return True
         return False
 
@@ -39,3 +41,13 @@ class UnixShellWildcardsFilter(BaseFilter):
 
     def match(self, pathname):
         return self._match(pathname)
+
+    def filter_dircontent(self, dircontent):
+        for directory, filepath in dircontent:
+            if self.match(filepath):
+                yield directory, filepath
+
+if __name__ == '__main__':
+    assert UnixShellWildcardsFilter('*.jpg').match('sdfbasdfa.txt') == False
+    assert UnixShellWildcardsFilter().match('sdfbasdfa.txt')
+    assert UnixShellWildcardsFilter('*txt').match('sdfbasdfa.txt')

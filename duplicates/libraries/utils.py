@@ -14,11 +14,17 @@ class DuplicateExceptions(Exception):
     pass
 
 
-def absolute_path(directory):
-    directory = os.path.expanduser(directory)
-    directory = os.path.expandvars(directory)
-    directory = os.path.normpath(directory)
-    return os.path.abspath(directory)
+def absolute_path(path):
+    path = os.path.expanduser(path)
+    path = os.path.expandvars(path)
+    path = os.path.normpath(path)
+    return os.path.abspath(path)
+
+
+def relative_path(directory, path):
+    abs_directory = absolute_path(directory)
+    abs_path = absolute_path(path)
+    return os.path.relpath(abs_path, abs_directory)
 
 
 def serialize_date(date):

@@ -14,14 +14,8 @@ class DirNotFoundError(DuplicateExceptions):
 class Directory(object):
     """Describe a directory"""
 
-    def __init__(self, path):
-        super(Directory, self).__init__()
-        self._directory = absolute_path(path)
-        if not os.path.isdir(self._directory):
-            raise DirNotFoundError(self._directory)
-
-    def dir_content(self, recursive=True, limit=float("inf"),
-                    pathname_filter=None):
+    @classmethod
+    def content(cls, path, recursive=True, limit=float("inf")):
         """
         yield white-listed files in the passed directory
 
@@ -31,26 +25,24 @@ class Directory(object):
             pathname_filter: a function that takes a pathname in input
                              and returns True or False
         """
-        if pathname_filter is None:
-            def true(pathname):
-                return True
-            pathname_filter = true
+        directory = absolute_path(path)
+        if not os.path.isdir(directory):
+            raise DirNotFoundError(directory)
 
-        for pathname in self._dir_content(recursive):
+        for pathname in cls._content(directory, recursive):
             limit -= 1
             if limit < 0:
                 break
-            if pathname_filter(pathname):
-                yield pathname
+            yield directory, pathname
 
-    def _dir_content(self, recursive=True):
-        dir_name = self._directory
-        for root, dirs, files in os.walk(unicode(dir_name)):
+    @classmethod
+    def _content(cls, directory, recursive=True):
+        for root, dirs, files in os.walk(unicode(directory)):
             for name in files:
                 yield os.path.join(root, name)
             if not recursive:
                 break
 
-    @property
-    def pathname(self):
-        return self._directory
+if __name__ == '__main__':
+    for directory, path in Directory.content('.'):
+        print(directory, path)

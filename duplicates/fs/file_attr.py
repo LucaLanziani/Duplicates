@@ -121,7 +121,7 @@ class FileAttr(object):
         attrs_to_method = cls._attr_to_method()
         attrs = set(attrs_to_method.keys()).intersection(attributes)
         result = {
-            'directory': absolute_path(directory),
+            'rootdir': absolute_path(directory),
             'pathname': relative_path(directory, pathname)
         }
         for attr in attrs:

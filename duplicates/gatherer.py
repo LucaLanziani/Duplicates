@@ -14,7 +14,7 @@ from duplicates.store.inmemory_store import InmemoryStore
 
 log = logging.getLogger(__name__)
 
-ATTRIBUTES = set(['hash', 'abs_pathame', 'directory', 'filename', 'extention', 'abs_pathname_hash', 'size',
+ATTRIBUTES = set(['hash', 'abs_pathame', 'directory', 'filename', 'extension', 'abs_pathname_hash', 'size',
                   'lmtime', 'pathname_hash'])
 
 invalid_attributes = ATTRIBUTES.difference(FileAttr._attr_to_method().keys())

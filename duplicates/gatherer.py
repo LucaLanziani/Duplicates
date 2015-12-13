@@ -10,7 +10,8 @@ from duplicates.fs.directory import Directory
 from duplicates.fs.file_attr import FileAttr
 from duplicates.libraries.filters import UnixShellWildcardsFilter
 from duplicates.libraries.output import DummyOutput
-from duplicates.store.inmemory_store import InmemoryStore
+from duplicates.store.json_store import JsonStore
+
 
 log = logging.getLogger(__name__)
 
@@ -23,20 +24,20 @@ assert invalid_attributes == set([]), 'Those attributes do not exist %s' % inval
 class Gatherer(object):
 
     def __init__(self, directory, output=None, unix_patterns=None, store=None):
-        self._settings(output, unix_patterns, store)
         self._directory = directory
+        self._settings(output, unix_patterns, store)
         self._pathname_sha_cache = {}
 
     def _settings(self, output, unix_patterns, store):
         if store is None:
-            store = InmemoryStore
+            store = JsonStore
         if output is None:
             output = DummyOutput()
         if not unix_patterns:
             unix_patterns = ['*']
 
         self._output = output
-        self._store = store()
+        self._store = store(self._directory)
         self._unixpatterns_filter = UnixShellWildcardsFilter(*unix_patterns)
 
     def _progress(self, signum, stack):

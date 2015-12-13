@@ -11,7 +11,6 @@ from duplicates.store.dummy_store import DummyStore
 
 from munch import Munch
 
-FILESTORE = ".duplicates.json.gz"
 KNOWN_PATHNAMES_HASHES = 'known_pathnames_hashes'
 PATHNAME_HASH_TO_ATTRS = 'pathname_hash_to_attrs'
 FILE_HASH_TO_PATHNAMES = 'file_hash_to_pathnames'
@@ -55,7 +54,6 @@ class InmemoryStore(DummyStore):
             FILE_HASH_TO_PATHNAMES: {},
             LAST_UPDATE: serialize_date(epoch)
         }
-        self.store_path = None
         super(InmemoryStore, self).__init__(default_data)
         self.load()
 

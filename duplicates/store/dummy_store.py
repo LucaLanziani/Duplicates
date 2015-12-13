@@ -12,6 +12,8 @@ class DummyStore(object):
         self._data = None
         if self._default_data is None:
             self._default_data = {}
+        if not hasattr(self, 'store_path'):
+            self.store_path = None
 
     def load(self):
         if self._data is None:

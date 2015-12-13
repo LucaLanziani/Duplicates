@@ -11,10 +11,20 @@ class DirNotFoundError(DuplicateExceptions):
     pass
 
 
+def dir_exists(func):
+    def func_wrapper(cls, pathname, *args, **kwargs):
+        abs_pathname = absolute_path(pathname)
+        if not os.path.isdir(abs_pathname):
+            raise DirNotFoundError(abs_pathname)
+        return func(cls, pathname, *args, **kwargs)
+    return func_wrapper
+
+
 class Directory(object):
     """Describe a directory"""
 
     @classmethod
+    @dir_exists
     def content(cls, path, recursive=True, limit=float("inf")):
         """
         yield white-listed files in the passed directory
@@ -26,9 +36,6 @@ class Directory(object):
                              and returns True or False
         """
         directory = absolute_path(path)
-        if not os.path.isdir(directory):
-            raise DirNotFoundError(directory)
-
         for pathname in cls._content(directory, recursive):
             limit -= 1
             if limit < 0:
@@ -36,6 +43,7 @@ class Directory(object):
             yield directory, pathname
 
     @classmethod
+    @dir_exists
     def _content(cls, directory, recursive=True):
         for root, dirs, files in os.walk(unicode(directory)):
             for name in files:

@@ -9,12 +9,16 @@ import os
 
 from collections import defaultdict
 
-from duplicates.libraries.utils import absolute_path
+from duplicates.libraries.utils import absolute_path, DuplicateExceptions
 from duplicates.store.inmemory_store import FILE_HASH_TO_PATHNAMES, InmemoryStore, KNOWN_PATHNAMES_HASHES
 
 FILESTORE = ".duplicates.json.gz"
 
 log = logging.getLogger(__name__)
+
+
+class StoreNotFoundError(DuplicateExceptions):
+    pass
 
 
 class JsonStore(InmemoryStore):
@@ -43,22 +47,31 @@ class JsonStore(InmemoryStore):
     def __init__(self, directory):
         self._directory = absolute_path(directory)
         self.store_path = os.path.join(self._directory, FILESTORE)
-        super(JsonStore, self).__init__()
+        super(JsonStore, self).__init__(directory)
 
     def _from_json(self):
         try:
             with gzip.open(self.store_path, 'rb') as fd:
                 result = json.load(fd)
+            self.exists = True
             return result
         except Exception:
+            self.exists = False
             return self._default_data
 
     def _to_json(self):
-        self._data[KNOWN_PATHNAMES_HASHES] = list(self._known_pathnames_hashes)
-        with gzip.open(self.store_path, 'wb') as fd:
-            json.dump(self._data, fd, indent=4)
+        try:
+            self._data[KNOWN_PATHNAMES_HASHES] = list(self._known_pathnames_hashes)
+            with gzip.open(self.store_path, 'wb') as fd:
+                json.dump(self._data, fd, indent=4)
+        except Exception:
+            log.exception('Something when wrong trying to persist the store to %s', self.store_path)
+        else:
+            self.exists = True
 
     def load(self):
+        if not os.path.isdir(self._directory):
+            raise IOError("Directory %s do not exists" % self._directory)
         loaded = self._from_json()
         loaded[FILE_HASH_TO_PATHNAMES] = defaultdict(list, loaded[FILE_HASH_TO_PATHNAMES])
         loaded[KNOWN_PATHNAMES_HASHES] = set(loaded[KNOWN_PATHNAMES_HASHES])

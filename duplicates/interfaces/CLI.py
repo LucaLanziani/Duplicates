@@ -5,11 +5,14 @@ from __future__ import (absolute_import, division, print_function,
 
 import logging
 import os
+import sys
 
 from docopt import docopt
 from duplicates import start_logger
-from duplicates.gatherer import Gatherer
+from duplicates.analyzer import Analyzer
+from duplicates.indexer import Indexer
 from duplicates.libraries.output import ConsoleOutput
+from duplicates.libraries.utils import DuplicateExceptions
 from schema import And, Optional, Or, Schema, SchemaError
 
 log = logging.getLogger(__name__)
@@ -22,11 +25,14 @@ class CommandLineInterface(object):
     line, the patterns can include "Unix shell-style wildcards"
 
     Options:
-        --show-content          print all the files analysed
-        --show-duplicates       print files that have duplicates, duplicates path are separated by tabs
-        --progress              print progress update in console
-        --no-store              do not save the gathered information on filesystem
-        --log-level=<LEVEL>     process debug level [default: CRITICAL]
+        --index                     index directory content
+        --show-indexed              print all the files in the index
+        --show-duplicates           print files that have duplicates, duplicates path are separated by tabs
+        --progress                  print progress update in console
+        --no-store                  do not save the gathered information on filesystem
+        --intersection=<DIRECTORY>  show the common files between the two directories
+        --difference=<DIRECTORY>    show the files in the current dir that are not in the given dir
+        --log-level=<LEVEL>         process debug level [default: CRITICAL]
 
     Examples:
         %(name)s .                  # every file
@@ -40,10 +46,13 @@ class CommandLineInterface(object):
     def _validate_args(self, opt):
         schema = Schema({
             'DIRECTORY': And(os.path.exists, error="Dir does not exists"),
-            Optional('--show-content'): bool,
+            Optional('--index'): bool,
+            Optional('--show-indexed'): bool,
             Optional('--show-duplicates'): bool,
             Optional('--progress'): bool,
             Optional('--no-store'): bool,
+            Optional('--intersection'): Or(unicode, str, None),
+            Optional('--difference'): Or(unicode, str, None),
             Optional('--log-level'): Or(unicode, str),
             Optional('PATTERNS'): [Or(unicode, str)]
         })
@@ -60,24 +69,38 @@ class CommandLineInterface(object):
                      version=None, options_first=False)
         return self._validate_args(opt)
 
+    def _create_index(self, opt):
+        Indexer(
+            opt['DIRECTORY'],
+            output=ConsoleOutput(False, opt['--progress']),
+            unix_patterns=opt['PATTERNS']
+        ).run(not opt['--no-store'])
+
+    def _analize(self, opt):
+        analizer = Analyzer(opt['DIRECTORY'], output=ConsoleOutput(True, False))
+        if opt['--intersection']:
+            analizer.intersection(opt['--intersection'])
+        if opt['--difference']:
+            analizer.difference(opt['--difference'])
+
     def run(self, name=None):
         try:
             opt = self._parse_args(name)
             start_logger(opt['--log-level'])
-            gatherer = Gatherer(
-                opt['DIRECTORY'],
-                output=ConsoleOutput(opt['--show-content'] or opt['--show-duplicates'], opt['--progress']),
-                unix_patterns=opt['PATTERNS']
-            ).run(not opt['--no-store'])
 
-            if opt['--show-content']:
-                gatherer.print_content()
+            if opt['--index']:
+                self._create_index(opt)
 
-            if opt['--show-duplicates']:
-                gatherer.print_duplicates()
+            if opt['--intersection'] or opt['--difference']:
+                self._analize(opt)
 
         except KeyboardInterrupt:
             log.exception('Exiting on CTRL^C')
+        except DuplicateExceptions as e:
+            log.critical('Something when wrong with the software: %s', e.message)
+            if hasattr(e, 'exit_code'):
+                sys.exit(e.exit_code)
+            sys.exit(os.EX_SOFTWARE)
 
 if __name__ == '__main__':
     CommandLineInterface().run()

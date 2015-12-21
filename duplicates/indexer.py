@@ -21,7 +21,7 @@ invalid_attributes = ATTRIBUTES.difference(FileAttr._attr_to_method().keys())
 assert invalid_attributes == set([]), 'Those attributes do not exist %s' % invalid_attributes
 
 
-class Gatherer(object):
+class Indexer(object):
 
     def __init__(self, directory, output=None, unix_patterns=None, store=None):
         self._directory = directory
@@ -68,7 +68,7 @@ class Gatherer(object):
         for pathname, _ in self._filtered_content():
             yield pathname
 
-    def collect_data(self):
+    def index(self):
         """
         Collect files data and return the store object
         """
@@ -80,17 +80,8 @@ class Gatherer(object):
         self._output.print()
         return self._store
 
-    def print_duplicates(self):
-        for _, duplicates in self._store.paths_by_hash():
-            if len(duplicates) > 1:
-                self._output.print('\t'.join(duplicates))
-
-    def print_content(self):
-        for filepath in self._pathnames():
-            self._output.print(filepath)
-
     def run(self, store=True):
-        data = self.collect_data()
+        data = self.index()
         if store:
             data.save()
         return self

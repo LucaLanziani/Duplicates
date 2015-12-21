@@ -47,7 +47,7 @@ class InmemoryStore(DummyStore):
 
     """
 
-    def __init__(self):
+    def __init__(self, directory):
         default_data = {
             KNOWN_PATHNAMES_HASHES: set([]),
             PATHNAME_HASH_TO_ATTRS: {},
@@ -55,6 +55,7 @@ class InmemoryStore(DummyStore):
             LAST_UPDATE: serialize_date(epoch)
         }
         super(InmemoryStore, self).__init__(default_data)
+        self._base_dir = directory
         self.load()
 
     def _local_path(self, abs_pathname):
@@ -69,9 +70,9 @@ class InmemoryStore(DummyStore):
         file_attr = Munch(file_attr)
         pathname = file_attr.pathname
         pathname_hash = file_attr.pathname_hash
-        if file_attr.hash not in self._hash_to_pathnames:
-            self._hash_to_pathnames[file_attr.hash] = []
-        self._hash_to_pathnames[file_attr.hash].append(pathname)
+        if file_attr.hash not in self.hash_to_pathnames:
+            self.hash_to_pathnames[file_attr.hash] = []
+        self.hash_to_pathnames[file_attr.hash].append(pathname)
         self._pathname_hash_to_attr[pathname_hash] = {
             SIZE: file_attr.size,
             LMTIME: file_attr.lmtime,
@@ -86,7 +87,7 @@ class InmemoryStore(DummyStore):
         pathname_hash = FileAttr.hash_pathname(pathname)
         self._known_pathnames_hashes.remove(pathname_hash)
         stored_data = self._pathname_hash_to_attr[pathname_hash]
-        self._hash_to_pathnames[stored_data[HASH]].remove(stored_data[PATHNAME])
+        self.hash_to_pathnames[stored_data[HASH]].remove(stored_data[PATHNAME])
         del(self._pathname_hash_to_attr[pathname_hash])
 
     def add_file(self, file_attr):
@@ -110,8 +111,11 @@ class InmemoryStore(DummyStore):
         self._remove_pathname(pathname)
 
     def paths_by_hash(self):
-        for hash, paths in self._hash_to_pathnames.iteritems():
+        for hash, paths in self.hash_to_pathnames.iteritems():
             yield hash, paths
+
+    def hash_to_abs_pathnames(self, hash):
+        return map(self._absolute_pathname, self.hash_to_pathnames[hash])
 
     def __repr__(self):
         return repr(self._data)
@@ -128,7 +132,7 @@ class InmemoryStore(DummyStore):
         return self._data[PATHNAME_HASH_TO_ATTRS]
 
     @property
-    def _hash_to_pathnames(self):
+    def hash_to_pathnames(self):
         return self._data[FILE_HASH_TO_PATHNAMES]
 
     @property

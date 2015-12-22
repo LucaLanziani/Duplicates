@@ -23,7 +23,7 @@ class Analyzer(object):
             self.output = DummyOutput()
 
     def duplicates(self):
-        for _, duplicates in self._main_store.paths_by_hash():
+        for _, duplicates in self._store.paths_by_hash():
             if len(duplicates) > 1:
                 yield duplicates
 

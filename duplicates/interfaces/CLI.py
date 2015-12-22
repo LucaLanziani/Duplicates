@@ -5,6 +5,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import logging
 import os
+import pprint
 import sys
 
 from docopt import docopt
@@ -14,6 +15,7 @@ from duplicates.indexer import Indexer
 from duplicates.libraries.output import ConsoleOutput
 from duplicates.libraries.utils import DuplicateExceptions
 from schema import And, Optional, Or, Schema, SchemaError
+
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +29,7 @@ class CommandLineInterface(object):
     Options:
         --index                     index directory content
         --show-indexed              print all the files in the index
-        --show-duplicates           print files that have duplicates, duplicates path are separated by tabs
+        --duplicates                print files that have duplicates, duplicates path are separated by tabs
         --progress                  print progress update in console
         --no-store                  do not save the gathered information on filesystem
         --intersection=<DIRECTORY>  show the common files between the two directories
@@ -48,7 +50,7 @@ class CommandLineInterface(object):
             'DIRECTORY': And(os.path.exists, error="Dir does not exists"),
             Optional('--index'): bool,
             Optional('--show-indexed'): bool,
-            Optional('--show-duplicates'): bool,
+            Optional('--duplicates'): bool,
             Optional('--progress'): bool,
             Optional('--no-store'): bool,
             Optional('--intersection'): Or(unicode, str, None),
@@ -82,6 +84,9 @@ class CommandLineInterface(object):
             analizer.intersection(opt['--intersection'])
         if opt['--difference']:
             analizer.difference(opt['--difference'])
+        if opt['--duplicates']:
+            for duplicates in analizer.duplicates():
+                pprint.pprint(duplicates)
 
     def run(self, name=None):
         try:
@@ -91,7 +96,7 @@ class CommandLineInterface(object):
             if opt['--index']:
                 self._create_index(opt)
 
-            if opt['--intersection'] or opt['--difference']:
+            if opt['--intersection'] or opt['--difference'] or opt['--duplicates']:
                 self._analize(opt)
 
         except KeyboardInterrupt:

@@ -29,7 +29,7 @@ class CommandLineInterface(object):
     Options:
         --index                     index directory content
         --show-indexed              print all the files in the index
-        --duplicates                print files that have duplicates, duplicates path are separated by tabs
+        --duplicates                print files that have duplicates, duplicates path are printed in TSV format
         --progress                  print progress update in console
         --no-store                  do not save the gathered information on filesystem
         --intersection=<DIRECTORY>  show the common files between the two directories
@@ -44,6 +44,7 @@ class CommandLineInterface(object):
 
     def __init__(self):
         super(CommandLineInterface, self).__init__()
+        self.output = ConsoleOutput(True, False)
 
     def _validate_args(self, opt):
         schema = Schema({
@@ -86,7 +87,7 @@ class CommandLineInterface(object):
             analizer.difference(opt['--difference'])
         if opt['--duplicates']:
             for duplicates in analizer.duplicates():
-                pprint.pprint(duplicates)
+                self.output.print("\t".join(duplicates))
 
     def run(self, name=None):
         try:

@@ -39,3 +39,23 @@ make UPDATE_ENV
 ```
 
 ## Enjoy the development
+
+# Setup Git hooks
+
+It would be a good idea to setup the git hooks to test the project before the commit and the push, the following are the suggested hooks for the project.
+
+### .git/hooks/pre-commit
+
+```bash
+#!/bin/bash
+make FLAKE8
+```
+
+### .git/hooks/pre-push
+
+```bash
+#!/bin/sh
+remot="$1"
+url="$2"
+make TESTS
+```

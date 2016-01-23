@@ -107,6 +107,10 @@ class CommandLineInterface(object):
             for duplicates in analyzer.duplicates(store):
                 self.output.print("\t".join(duplicates))
 
+        if opt['--show-indexed']:
+            analyzer.show_indexed()
+
+
     def run(self, name=None):
         try:
             opt = self._parse_args(name)
@@ -115,8 +119,8 @@ class CommandLineInterface(object):
             if opt['--index']:
                 self._create_index(opt)
 
-            if opt['--intersection'] or opt['--difference'] or opt['--duplicates']:
-                self._analyze(opt)
+            if opt['--intersection'] or opt['--difference'] or opt['--duplicates'] or opt['--show-indexed']:
+                self._analize(opt)
 
         except KeyboardInterrupt:
             log.exception('Exiting on CTRL^C')

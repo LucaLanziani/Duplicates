@@ -38,3 +38,7 @@ class Analyzer(object):
         filehashs = main_store_hashs.difference(secondary_store_hashs)
         list_of_list_of_paths = map(main_store.hash_to_abs_pathnames, filehashs)
         return [path for list_of_paths in list_of_list_of_paths for path in list_of_paths]
+
+    def show_indexed(self):
+        for abs_pathname in self._store.list_of_abs_pathnames():
+            self.output.print("%s" % abs_pathname)

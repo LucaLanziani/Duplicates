@@ -11,7 +11,6 @@ from nose.tools import eq_
 TEST_DIR_1 = './test/files/test_dir_1'
 TEST_DIR_2 = './test/files/test_dir_2'
 
-
 class AnalyzerTest(unittest.TestCase):
 
     def setUp(self):

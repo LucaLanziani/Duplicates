@@ -89,6 +89,10 @@ class InmemoryStore(DummyStore):
         self.hash_to_pathnames[stored_data[HASH]].remove(stored_data[PATHNAME])
         del(self._pathname_hash_to_attr[pathname_hash])
 
+    def list_of_abs_pathnames(self):
+        for _, file_attr in self._pathname_hash_to_attr.iteritems():
+            yield self._absolute_pathname(file_attr["pathname"])
+
     def add_file(self, file_attr):
         if not self.is_file_known(file_attr):
             self._add_file(file_attr)

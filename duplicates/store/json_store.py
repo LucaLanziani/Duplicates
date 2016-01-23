@@ -65,7 +65,7 @@ class JsonStore(InmemoryStore):
             with gzip.open(self.store_path, 'wb') as fd:
                 json.dump(self._data, fd, indent=4)
         except Exception:
-            log.exception('Something when wrong trying to persist the store to %s', self.store_path)
+            log.exception('Something went wrong trying to persist the store to %s', self.store_path)
         else:
             self.exists = True
 

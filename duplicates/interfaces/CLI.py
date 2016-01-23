@@ -80,14 +80,17 @@ class CommandLineInterface(object):
         ).run(not opt['--no-store'])
 
     def _analize(self, opt):
-        analizer = Analyzer(opt['DIRECTORY'], output=ConsoleOutput(True, False))
+        analyzer = Analyzer(opt['DIRECTORY'], output=ConsoleOutput(True, False))
         if opt['--intersection']:
-            analizer.intersection(opt['--intersection'])
+            analyzer.intersection(opt['--intersection'])
         if opt['--difference']:
-            analizer.difference(opt['--difference'])
+            analyzer.difference(opt['--difference'])
         if opt['--duplicates']:
-            for duplicates in analizer.duplicates():
+            for duplicates in analyzer.duplicates():
                 self.output.print("\t".join(duplicates))
+        if opt['--show-indexed']:
+            analyzer.show_indexed()
+
 
     def run(self, name=None):
         try:
@@ -97,7 +100,7 @@ class CommandLineInterface(object):
             if opt['--index']:
                 self._create_index(opt)
 
-            if opt['--intersection'] or opt['--difference'] or opt['--duplicates']:
+            if opt['--intersection'] or opt['--difference'] or opt['--duplicates'] or opt['--show-indexed']:
                 self._analize(opt)
 
         except KeyboardInterrupt:

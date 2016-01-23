@@ -50,3 +50,7 @@ class Analyzer(object):
         difference = set(self._store.hash_to_pathnames.keys()).difference(set(store.hash_to_pathnames.keys()))
         for hash in difference:
             self.output.print("%s" % '\n'.join(self._store.hash_to_abs_pathnames(hash)))
+
+    def show_indexed(self):
+        for abs_pathname in self._store.list_of_abs_pathnames():
+            self.output.print("%s" % abs_pathname)

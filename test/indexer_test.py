@@ -1,15 +1,16 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
-import unittest
 import os
+import unittest
 
 from duplicates.indexer import Indexer
 from duplicates.store.json_store import FILESTORE
-from nose.tools import eq_, assert_true
+from nose.tools import assert_true, eq_
 
 TEST_DIR = './test/files/test_dir_1/'
 STORE_PATH = os.path.join(TEST_DIR, FILESTORE)
+
 
 class IndexerTest(unittest.TestCase):
 

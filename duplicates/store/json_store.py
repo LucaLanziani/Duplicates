@@ -53,25 +53,21 @@ class JsonStore(InmemoryStore):
         try:
             with gzip.open(self.store_path, 'rb') as fd:
                 result = json.load(fd)
-            self.exists = True
             return result
-        except Exception:
-            self.exists = False
-            return self._default_data
+        except Exception as e:
+            log.exception('Something went wrong trying to load the store from %s', self.store_path)
+            raise e
 
     def _to_json(self):
         try:
             self._data[KNOWN_PATHNAMES_HASHES] = list(self._known_pathnames_hashes)
             with gzip.open(self.store_path, 'wb') as fd:
                 json.dump(self._data, fd, indent=4)
-        except Exception:
-            log.exception('Something when wrong trying to persist the store to %s', self.store_path)
-        else:
-            self.exists = True
+        except Exception as e:
+            log.exception('Something went wrong trying to persist the store to %s', self.store_path)
+            raise e
 
     def load(self):
-        if not os.path.isdir(self._directory):
-            raise IOError("Directory %s do not exists" % self._directory)
         loaded = self._from_json()
         loaded[FILE_HASH_TO_PATHNAMES] = defaultdict(list, loaded[FILE_HASH_TO_PATHNAMES])
         loaded[KNOWN_PATHNAMES_HASHES] = set(loaded[KNOWN_PATHNAMES_HASHES])

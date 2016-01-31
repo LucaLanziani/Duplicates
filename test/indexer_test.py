@@ -6,7 +6,7 @@ import unittest
 from duplicates.indexer import Indexer
 from nose.tools import eq_
 
-TEST_DIR = './test/files/'
+TEST_DIR = './test/files/test_dir_1/'
 
 
 class IndexerTest(unittest.TestCase):

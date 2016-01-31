@@ -14,39 +14,26 @@ log = logging.getLogger(__name__)
 
 class Analyzer(object):
 
-    def __init__(self, directory, output=None):
-        self._directory = directory
-        self._pathname_sha_cache = {}
-        self._store = self._load_store(directory)
+    def __init__(self, output=None):
         self.output = output
         if output is None:
             self.output = DummyOutput()
 
-    def duplicates(self):
-        for _, duplicates in self._store.paths_by_hash():
+    def duplicates(self, store):
+        for _, duplicates in store.paths_by_hash():
             if len(duplicates) > 1:
                 yield duplicates
 
-    def _load_store(self, directory):
-        store = JsonStore(directory)
-        if (not store.exists):
-            msg = "Can't find any index, please run the software with --index for the following directory:"
-            log.error(msg + " %s", directory)
-            excp = StoreNotFoundError(msg, directory)
-            excp.message = msg + " %s" % (directory)
-            excp.exit_code = os.EX_NOINPUT
-            raise excp
-        return store
-
-    def intersection(self, directory):
-        store = self._load_store(directory)
-        common = set(self._store.hash_to_pathnames.keys()).intersection(set(store.hash_to_pathnames.keys()))
+    def intersection(self, store, second_store):
+        common = set(store.hash_to_pathnames.keys()).intersection(set(second_store.hash_to_pathnames.keys()))
+        results = []
         for hash in common:
-            self.output.print("%s -> %s" % (self._store.hash_to_abs_pathnames(hash),
-                                            store.hash_to_abs_pathnames(hash)))
+            results.append((store.hash_to_abs_pathnames(hash), second_store.hash_to_abs_pathnames(hash)))
+        return results
 
-    def difference(self, directory):
-        store = self._load_store(directory)
-        difference = set(self._store.hash_to_pathnames.keys()).difference(set(store.hash_to_pathnames.keys()))
+    def difference(self, store, second_store):
+        difference = set(store.hash_to_pathnames.keys()).difference(set(second_store.hash_to_pathnames.keys()))
+        results = []
         for hash in difference:
-            self.output.print("%s" % '\n'.join(self._store.hash_to_abs_pathnames(hash)))
+            results.append(store.hash_to_abs_pathnames(hash))
+        return results

@@ -14,6 +14,7 @@ from duplicates.analyzer import Analyzer
 from duplicates.indexer import Indexer
 from duplicates.libraries.output import ConsoleOutput
 from duplicates.libraries.utils import DuplicateExceptions
+from duplicates.store.json_store import JsonStore
 from schema import And, Optional, Or, Schema, SchemaError
 
 
@@ -79,14 +80,33 @@ class CommandLineInterface(object):
             unix_patterns=opt['PATTERNS']
         ).run(not opt['--no-store'])
 
-    def _analize(self, opt):
-        analizer = Analyzer(opt['DIRECTORY'], output=ConsoleOutput(True, False))
+    def _analyze(self, opt):
+        store = Indexer(
+            opt['DIRECTORY'],
+            unix_patterns=opt['PATTERNS']
+        ).index()
+
+        analyzer = Analyzer(output=ConsoleOutput(True, False))
+
         if opt['--intersection']:
-            analizer.intersection(opt['--intersection'])
+            second_store = Indexer(
+                opt['--intersection'],
+                unix_patterns=opt['PATTERNS']
+            ).index()
+            results = analyzer.intersection(store, second_store)
+            for tuple in results:
+                self.output.print("%s -> %s" % (tuple[0], tuple[1]))
+
         if opt['--difference']:
-            analizer.difference(opt['--difference'])
+            second_store = Indexer(
+                opt['--difference'],
+                unix_patterns=opt['PATTERNS']
+            ).index()
+            results = analyzer.difference(store, second_store)
+            self.output.print("%s" % '\n'.join(results))
+
         if opt['--duplicates']:
-            for duplicates in analizer.duplicates():
+            for duplicates in analyzer.duplicates(store):
                 self.output.print("\t".join(duplicates))
 
     def run(self, name=None):
@@ -98,7 +118,7 @@ class CommandLineInterface(object):
                 self._create_index(opt)
 
             if opt['--intersection'] or opt['--difference'] or opt['--duplicates']:
-                self._analize(opt)
+                self._analyze(opt)
 
         except KeyboardInterrupt:
             log.exception('Exiting on CTRL^C')

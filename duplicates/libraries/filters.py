@@ -46,8 +46,3 @@ class UnixShellWildcardsFilter(BaseFilter):
         for filepath, directory in dircontent:
             if self.match(filepath):
                 yield filepath, directory
-
-if __name__ == '__main__':
-    assert UnixShellWildcardsFilter('*.jpg').match('sdfbasdfa.txt') == False
-    assert UnixShellWildcardsFilter().match('sdfbasdfa.txt')
-    assert UnixShellWildcardsFilter('*txt').match('sdfbasdfa.txt')

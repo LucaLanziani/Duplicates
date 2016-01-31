@@ -134,6 +134,3 @@ class FileAttr(object):
             attributes = cls._attr_to_method().keys()
         for pathname, rootDir in dircontent:
             yield cls.get(pathname, rootDir, attributes=attributes)
-
-if __name__ == '__main__':
-    print(FileAttr.get('.', 'setup.py', attributes=('size', 'lmtime')))

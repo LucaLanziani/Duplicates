@@ -13,7 +13,7 @@ MD5 = 'd41d8cd98f00b204e9800998ecf8427e'
 SHA1 = 'da39a3ee5e6b4b0d3255bfef95601890afd80709'
 SHA256 = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
 
-UNICODE_PATHNAME = './test/files/test_dir_1/03_Руководство_по_эксплуатации.jpg'
+UNICODE_PATHNAME = './test/files/test_dir_1/empty_file_Руководство_по_эксплуатации.jpg'
 
 
 class FileAttrTest(unittest.TestCase):
@@ -51,4 +51,4 @@ class FileAttrTest(unittest.TestCase):
 
     def test_unicode_filename(self):
         ph = FileAttr._pathname_hash(UNICODE_PATHNAME)
-        eq_(ph, '9e99520ee361ddcf651ae1d715cda6166ac65fb8d78f93101f19264dd1fcbd7c')
+        eq_(ph, 'e4fde0183f48f0eee7fa77273ec757b14131630fe760290e221cd82e25745100')

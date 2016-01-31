@@ -5,7 +5,6 @@ from __future__ import (absolute_import, division, print_function,
 
 import logging
 import os
-import pprint
 import sys
 
 from docopt import docopt
@@ -14,7 +13,6 @@ from duplicates.analyzer import Analyzer
 from duplicates.indexer import Indexer
 from duplicates.libraries.output import ConsoleOutput
 from duplicates.libraries.utils import DuplicateExceptions
-from duplicates.store.json_store import JsonStore
 from schema import And, Optional, Or, Schema, SchemaError
 
 
@@ -30,7 +28,7 @@ class CommandLineInterface(object):
     Options:
         --index                     index directory content
         --show-indexed              print all the files in the index
-        --duplicates                print files that have duplicates, duplicates path are printed in TSV format
+        --duplicates                print multiple copies of the same file in TSV format
         --progress                  print progress update in console
         --no-store                  do not save the gathered information on filesystem
         --intersection=<DIRECTORY>  show the common files between the two directories

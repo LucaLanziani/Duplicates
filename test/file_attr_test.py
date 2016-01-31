@@ -8,12 +8,12 @@ import unittest
 from duplicates.fs.file_attr import FileAttr, FileNotFoundError
 from nose.tools import eq_, ok_, raises
 
-TEST_FILE = './test/files/empty file.exe.test'
+TEST_FILE = './test/files/test_dir_1/empty file.exe.test'
 MD5 = 'd41d8cd98f00b204e9800998ecf8427e'
 SHA1 = 'da39a3ee5e6b4b0d3255bfef95601890afd80709'
 SHA256 = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
 
-UNICODE_PATHNAME = './test/files/03_Руководство_по_эксплуатации.jpg'
+UNICODE_PATHNAME = './test/files/test_dir_1/empty_file_Руководство_по_эксплуатации.jpg'
 
 
 class FileAttrTest(unittest.TestCase):
@@ -51,4 +51,4 @@ class FileAttrTest(unittest.TestCase):
 
     def test_unicode_filename(self):
         ph = FileAttr._pathname_hash(UNICODE_PATHNAME)
-        eq_(ph, '88f781908c7537dcb8b24f294c38b5ccc87ac0481cf203091766ab916a5b510d')
+        eq_(ph, 'e4fde0183f48f0eee7fa77273ec757b14131630fe760290e221cd82e25745100')

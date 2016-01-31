@@ -6,7 +6,7 @@ import unittest
 from duplicates.fs.directory import Directory, DirNotFoundError
 from nose.tools import eq_, raises
 
-DIRECTORY = './test/files'
+DIRECTORY = './test/files/test_dir_1'
 
 
 class DirectoryTest(unittest.TestCase):

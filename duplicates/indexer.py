@@ -27,6 +27,13 @@ class Indexer(object):
         self._directory = directory
         self._settings(output, unix_patterns, store)
         self._pathname_sha_cache = {}
+        self._load_store_content()
+
+    def _load_store_content(self):
+        try:
+            self._store.load()
+        except Exception:
+            log.debug("No existing store in directory %s", self._directory)
 
     def _settings(self, output, unix_patterns, store):
         if store is None:

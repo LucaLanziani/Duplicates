@@ -56,7 +56,6 @@ class InmemoryStore(DummyStore):
         }
         super(InmemoryStore, self).__init__(default_data)
         self._base_dir = directory
-        self.load()
 
     def _local_path(self, abs_pathname):
         return abs_pathname.replace(self._base_dir, '.')

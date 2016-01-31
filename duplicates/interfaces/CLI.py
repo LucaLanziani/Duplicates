@@ -33,7 +33,7 @@ class CommandLineInterface(object):
         --no-store                  do not save the gathered information on filesystem
         --intersection=<DIRECTORY>  show the common files between the two directories
         --difference=<DIRECTORY>    show the files in the current dir that are not in the given dir
-        --log-level=<LEVEL>         process debug level [default: CRITICAL]
+        --log-level=<LEVEL>         process debug level [default: INFO]
 
     Examples:
         %(name)s .                  # every file

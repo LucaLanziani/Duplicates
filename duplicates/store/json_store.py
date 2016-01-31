@@ -71,7 +71,7 @@ class JsonStore(InmemoryStore):
         loaded = self._from_json()
         loaded[FILE_HASH_TO_PATHNAMES] = defaultdict(list, loaded[FILE_HASH_TO_PATHNAMES])
         loaded[KNOWN_PATHNAMES_HASHES] = set(loaded[KNOWN_PATHNAMES_HASHES])
-        self._data = loaded
+        self._data.update(loaded)
 
     def save(self):
         self._to_json()

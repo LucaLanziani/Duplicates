@@ -14,6 +14,7 @@ from munch import Munch
 KNOWN_PATHNAMES_HASHES = 'known_pathnames_hashes'
 PATHNAME_HASH_TO_ATTRS = 'pathname_hash_to_attrs'
 FILE_HASH_TO_PATHNAMES = 'file_hash_to_pathnames'
+FILTERS = 'filters'
 
 SIZE = 'size'
 LMTIME = 'lmtime'
@@ -52,7 +53,8 @@ class InmemoryStore(DummyStore):
             KNOWN_PATHNAMES_HASHES: set([]),
             PATHNAME_HASH_TO_ATTRS: {},
             FILE_HASH_TO_PATHNAMES: {},
-            LAST_UPDATE: serialize_date(epoch)
+            LAST_UPDATE: serialize_date(epoch),
+            FILTERS: '*'
         }
         super(InmemoryStore, self).__init__(default_data)
         self._base_dir = directory
@@ -105,6 +107,14 @@ class InmemoryStore(DummyStore):
             if diff_size or diff_time:
                 return False
             return True
+
+    @property
+    def filters(self):
+        return self._data[FILTERS]
+
+    @filters.setter
+    def filters(self, filters):
+        self._data[FILTERS] = filters
 
     def remove_pathname(self, pathname):
         self._remove_pathname(pathname)

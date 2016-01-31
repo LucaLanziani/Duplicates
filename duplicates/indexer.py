@@ -25,9 +25,10 @@ class Indexer(object):
 
     def __init__(self, directory, output=None, unix_patterns=None, store=None):
         self._directory = directory
-        self._settings(output, unix_patterns, store)
+        self._settings(output, store)
         self._pathname_sha_cache = {}
         self._load_store_content()
+        self._set_filters(unix_patterns)
 
     def _load_store_content(self):
         try:
@@ -35,17 +36,21 @@ class Indexer(object):
         except Exception:
             log.debug("No existing store in directory %s", self._directory)
 
-    def _settings(self, output, unix_patterns, store):
+    def _set_filters(self, unix_patterns):
+        if not unix_patterns:
+            unix_patterns = self._store.filters
+
+        self._store.filters = unix_patterns
+        self._unixpatterns_filter = UnixShellWildcardsFilter(*self._store.filters)
+
+    def _settings(self, output, store):
         if store is None:
             store = JsonStore
         if output is None:
             output = DummyOutput()
-        if not unix_patterns:
-            unix_patterns = ['*']
 
         self._output = output
         self._store = store(self._directory)
-        self._unixpatterns_filter = UnixShellWildcardsFilter(*unix_patterns)
 
     def _progress(self, signum, stack):
         analized = len(self._store)
@@ -79,6 +84,7 @@ class Indexer(object):
         """
         Collect files data and return the store object
         """
+        log.info('Indexing %s content with %s filters', self._directory, self._store.filters)
         self._count_files()
         filtered_content = self._filtered_content()
         for attrs in FileAttr.attr_generator(filtered_content, attributes=ATTRIBUTES):

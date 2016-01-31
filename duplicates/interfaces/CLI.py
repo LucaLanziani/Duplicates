@@ -105,7 +105,6 @@ class CommandLineInterface(object):
 
         if opt['--duplicates']:
             for duplicates in analyzer.duplicates(store):
-                self.output.print("\t".join(duplicates))
 
         if opt['--show-indexed']:
             analyzer.show_indexed()

@@ -109,6 +109,13 @@ class InmemoryStore(DummyStore):
                 return False
             return True
 
+    def filter_known_files(self, dircontent):
+        attributes = set(['pathname_hash', 'size', 'lmtime'])
+        for filepath, directory in dircontent:
+            attr = FileAttr.get(filepath, directory, attributes=attributes)
+            if not self.is_file_known(attr):
+                yield filepath, directory
+
     @property
     def filters(self):
         return self._data[FILTERS]

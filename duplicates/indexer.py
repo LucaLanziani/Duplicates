@@ -84,8 +84,10 @@ class Indexer(object):
         )
 
     def _filtered_content(self):
-        content = Directory.content(self._directory)
-        return self._unixpatterns_filter.filter_dircontent(content)
+        log.debug('Create generator for filtered pathnames')
+        pathnames_generator = Directory.content(self._directory)
+        filtered_pathanames_generator = self._unixpatterns_filter.filter_dircontent(pathnames_generator)
+        return self._store.filter_known_files(filtered_pathanames_generator)
 
     def _pathnames(self):
         for pathname, _ in self._filtered_content():

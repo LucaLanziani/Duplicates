@@ -7,7 +7,7 @@ import logging
 import os
 
 from duplicates.fs.directory import Directory
-from duplicates.fs.file_attr import FileAttr
+from duplicates.fs.file_attr import Attributes, FileAttr
 from duplicates.libraries.filters import UnixShellWildcardsFilter
 from duplicates.libraries.output import DummyOutput
 from duplicates.store.json_store import JsonStore
@@ -15,7 +15,7 @@ from duplicates.store.json_store import JsonStore
 
 log = logging.getLogger(__name__)
 
-ATTRIBUTES = set(['hash', 'size', 'lmtime', 'pathname_hash'])
+ATTRIBUTES = set([Attributes.HASH, Attributes.SIZE, Attributes.LMTIME, Attributes.PATHNAME_HASH])
 
 invalid_attributes = ATTRIBUTES.difference(FileAttr._attr_to_method().keys())
 assert invalid_attributes == set([]), 'Those attributes do not exist %s' % invalid_attributes
@@ -68,6 +68,7 @@ class Indexer(object):
         self._output.progress(analized, self._filtered, self._total_files)
 
     def _count_files(self):
+        log.debug('Counting number of files in %s', self._directory)
         self._total_files = 0
         self._filtered = 0
         for filepath, directory in Directory.content(self._directory):

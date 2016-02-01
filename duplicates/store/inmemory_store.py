@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function,
 import logging
 import os
 
-from duplicates.fs.file_attr import FileAttr
+from duplicates.fs.file_attr import Attributes, FileAttr
 from duplicates.libraries.utils import (epoch, serialize_date)
 from duplicates.store.dummy_store import DummyStore
 
@@ -110,7 +110,7 @@ class InmemoryStore(DummyStore):
             return True
 
     def filter_known_files(self, dircontent):
-        attributes = set(['pathname_hash', 'size', 'lmtime'])
+        attributes = set([Attributes.PATHNAME_HASH, Attributes.SIZE, Attributes.LMTIME])
         for filepath, directory in dircontent:
             attr = FileAttr.get(filepath, directory, attributes=attributes)
             if not self.is_file_known(attr):

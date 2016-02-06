@@ -21,10 +21,21 @@ invalid_attributes = ATTRIBUTES.difference(FileAttr._attr_to_method().keys())
 assert invalid_attributes == set([]), 'Those attributes do not exist %s' % invalid_attributes
 
 
+def set_analyzed_directory_as_cwd(func):
+    def _decorator(self, *args, **kwargs):
+        cwd = os.getcwd()
+        os.chdir(self._directory)
+        try:
+            return func(self, *args, **kwargs)
+        finally:
+            os.chdir(cwd)
+    return _decorator
+
+
 class Indexer(object):
 
     def __init__(self, directory, output=None, unix_patterns=None, store=None):
-        self._directory = directory
+        self._directory = os.path.abspath(directory)
         self._settings(output, store)
         self._pathname_sha_cache = {}
         self._load_store_content()
@@ -80,6 +91,7 @@ class Indexer(object):
         for pathname, _ in self._filtered_content():
             yield pathname
 
+    @set_analyzed_directory_as_cwd
     def index(self):
         """
         Collect files data and return the store object
@@ -93,6 +105,14 @@ class Indexer(object):
         self._output.print()
         return self._store
 
+    @set_analyzed_directory_as_cwd
+    def purge(self):
+        for hash, paths in self._store.paths_by_hash():
+            for path in paths:
+                if not os.path.isfile(path):
+                    self._store.remove_pathname(path)
+
+    @set_analyzed_directory_as_cwd
     def run(self, store=True):
         data = self.index()
         if store:

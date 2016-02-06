@@ -111,6 +111,7 @@ class Indexer(object):
             for path in paths:
                 if not os.path.isfile(path):
                     self._store.remove_pathname(path)
+        self._store.save()
 
     @set_analyzed_directory_as_cwd
     def run(self, store=True):

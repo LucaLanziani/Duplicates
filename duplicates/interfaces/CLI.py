@@ -27,6 +27,7 @@ class CommandLineInterface(object):
 
     Options:
         --index                     index directory content
+        --purge                     purge store from no more existent files
         --show-indexed              print all the files in the index
         --duplicates                print multiple copies of the same file in TSV format
         --progress                  print progress update in console
@@ -49,6 +50,7 @@ class CommandLineInterface(object):
         schema = Schema({
             'DIRECTORY': And(os.path.exists, error="Dir does not exists"),
             Optional('--index'): bool,
+            Optional('--purge'): bool,
             Optional('--show-indexed'): bool,
             Optional('--duplicates'): bool,
             Optional('--progress'): bool,
@@ -71,12 +73,18 @@ class CommandLineInterface(object):
                      version=None, options_first=False)
         return self._validate_args(opt)
 
-    def _create_index(self, opt):
-        Indexer(
+    def _on_index(self, opt):
+        indexer = Indexer(
             opt['DIRECTORY'],
             output=ConsoleOutput(False, opt['--progress']),
             unix_patterns=opt['PATTERNS']
-        ).run(not opt['--no-store'])
+        )
+
+        if opt['--purge']:
+            indexer.purge()
+
+        if opt['--index']:
+            indexer.run(not opt['--no-store'])
 
     def _analyze(self, opt):
         store = Indexer(
@@ -112,8 +120,8 @@ class CommandLineInterface(object):
             opt = self._parse_args(name)
             start_logger(opt['--log-level'])
 
-            if opt['--index']:
-                self._create_index(opt)
+            if opt['--index'] or opt['--purge']:
+                self._on_index(opt)
 
             if opt['--intersection'] or opt['--difference'] or opt['--duplicates']:
                 self._analyze(opt)

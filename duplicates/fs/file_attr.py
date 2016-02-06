@@ -66,7 +66,7 @@ class FileAttr(object):
     @classmethod
     @file_exists
     def _hash(cls, pathname, hash_function=hashlib.md5):
-        log.debug('Hashing %s using %s algorithm', cls._abs_pathname, hash_function.__name__)
+        log.debug('Hashing %s using %s algorithm', pathname, hash_function.__name__)
         filehash = hash_function()
         with open(absolute_path(pathname), 'rb') as fp:
             buf = fp.read(BLOCKSIZE)
@@ -76,6 +76,10 @@ class FileAttr(object):
         return filehash.hexdigest()
 
     @classmethod
+    def _hash_string(cls, string, hash_function=hashlib.sha256):
+        return hash_function(string.encode('utf-8')).hexdigest()
+
+    @classmethod
     @file_exists
     def _abs_pathname(cls, pathname):
         return absolute_path(pathname)
@@ -83,12 +87,13 @@ class FileAttr(object):
     @classmethod
     @file_exists
     def _pathname_hash(cls, pathname):
-        return hashlib.sha256(pathname.encode('utf-8')).hexdigest()
+        assert not os.path.isabs(pathname)
+        return cls._hash_string(pathname)
 
     @classmethod
     @file_exists
     def _abs_pathname_hash(cls, pathname):
-        return cls._pathname_hash(cls._abs_pathname(pathname))
+        return cls._hash_string(cls._abs_pathname(pathname))
 
     @classmethod
     @file_exists
@@ -116,16 +121,21 @@ class FileAttr(object):
         return os.stat(cls._abs_pathname(pathname))[stat.ST_MTIME]
 
     @classmethod
+    def pathname_hash(cls, *args, **kwdargs):
+        return cls._pathname_hash(*args, **kwdargs)
+
+    @classmethod
     @file_exists
     def get(cls, pathname, directory, attributes=()):
         attrs_to_method = cls._attr_to_method()
         attrs = set(attrs_to_method.keys()).intersection(attributes)
+        rel_pathname = relative_path(directory, pathname)
         result = {
             'rootdir': absolute_path(directory),
-            'pathname': relative_path(directory, pathname)
+            'pathname': rel_pathname
         }
         for attr in attrs:
-            result[attr] = attrs_to_method[attr](cls._abs_pathname(pathname))
+            result[attr] = attrs_to_method[attr](rel_pathname)
         return result
 
     @classmethod

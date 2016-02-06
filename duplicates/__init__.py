@@ -6,3 +6,4 @@ def start_logger(level='INFO'):
     log = logging.getLogger(__name__)
     log.setLevel(level)
     log.info('STARTING')
+    log.debug('Log level set to %s', logging.getLevelName(log.getEffectiveLevel()))

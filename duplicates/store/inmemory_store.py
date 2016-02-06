@@ -85,7 +85,7 @@ class InmemoryStore(DummyStore):
 
     def _remove_pathname(self, pathname):
         log.debug('Removing %s from the store', pathname)
-        pathname_hash = FileAttr.hash_pathname(pathname)
+        pathname_hash = FileAttr.pathname_hash(pathname)
         self._known_pathnames_hashes.remove(pathname_hash)
         stored_data = self._pathname_hash_to_attr[pathname_hash]
         self.hash_to_pathnames[stored_data[HASH]].remove(stored_data[PATHNAME])

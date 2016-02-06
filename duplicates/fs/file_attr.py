@@ -85,13 +85,11 @@ class FileAttr(object):
         return absolute_path(pathname)
 
     @classmethod
-    @file_exists
     def _pathname_hash(cls, pathname):
         assert not os.path.isabs(pathname)
         return cls._hash_string(pathname)
 
     @classmethod
-    @file_exists
     def _abs_pathname_hash(cls, pathname):
         return cls._hash_string(cls._abs_pathname(pathname))
 

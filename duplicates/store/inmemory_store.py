@@ -90,6 +90,7 @@ class InmemoryStore(DummyStore):
         stored_data = self._pathname_hash_to_attr[pathname_hash]
         self.hash_to_pathnames[stored_data[HASH]].remove(stored_data[PATHNAME])
         del(self._pathname_hash_to_attr[pathname_hash])
+        log.debug('%s Removed', pathname)
 
     def add_file(self, file_attr):
         if not self.is_file_known(file_attr):

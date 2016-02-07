@@ -15,6 +15,23 @@ BLOCKSIZE = 65536
 log = logging.getLogger(__name__)
 
 
+class Attributes:
+    SHA256 = 'sha256'
+    SHA1 = 'sha1'
+    MD5 = 'md5'
+    HASH = 'hash'
+    ABS_PATHAME = 'abs_pathame'
+    DIRECTORY = 'directory'
+    FILENAME = 'filename'
+    EXTENSION = 'extension'
+    ABS_PATHNAME_HASH = 'abs_pathname_hash'
+    SIZE = 'size'
+    LMTIME = 'lmtime'
+    PATHNAME_HASH = 'pathname_hash'
+    PATHNAME = 'pathname'
+    ROOTDIR = 'rootdir'
+
+
 class FileNotFoundError(DuplicateExceptions):
     pass
 
@@ -34,18 +51,18 @@ class FileAttr(object):
     @classmethod
     def _attr_to_method(cls):
         return {
-            'sha256': cls._sha256,
-            'sha1': cls._sha1,
-            'md5': cls._md5,
-            'hash': cls._hash,
-            'abs_pathame': cls._abs_pathname,
-            'directory': cls._directory,
-            'filename': cls._filename,
-            'extension': cls._extension,
-            'abs_pathname_hash': cls._abs_pathname_hash,
-            'size': cls._size,
-            'lmtime': cls._lmtime,
-            'pathname_hash': cls._pathname_hash
+            Attributes.SHA256: cls._sha256,
+            Attributes.SHA1: cls._sha1,
+            Attributes.MD5: cls._md5,
+            Attributes.HASH: cls._hash,
+            Attributes.ABS_PATHAME: cls._abs_pathname,
+            Attributes.DIRECTORY: cls._directory,
+            Attributes.FILENAME: cls._filename,
+            Attributes.EXTENSION: cls._extension,
+            Attributes.ABS_PATHNAME_HASH: cls._abs_pathname_hash,
+            Attributes.SIZE: cls._size,
+            Attributes.LMTIME: cls._lmtime,
+            Attributes.PATHNAME_HASH: cls._pathname_hash
         }
 
     @classmethod
@@ -129,8 +146,8 @@ class FileAttr(object):
         attrs = set(attrs_to_method.keys()).intersection(attributes)
         rel_pathname = relative_path(directory, pathname)
         result = {
-            'rootdir': absolute_path(directory),
-            'pathname': rel_pathname
+            Attributes.ROOTDIR: absolute_path(directory),
+            Attributes.PATHNAME: rel_pathname
         }
         for attr in attrs:
             result[attr] = attrs_to_method[attr](rel_pathname)

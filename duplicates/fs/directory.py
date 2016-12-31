@@ -40,7 +40,7 @@ class Directory(object):
             limit -= 1
             if limit < 0:
                 break
-            yield pathname, directory
+            yield directory, os.path.relpath(pathname, directory)
 
     @classmethod
     @dir_exists

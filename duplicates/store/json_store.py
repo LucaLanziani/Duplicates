@@ -55,7 +55,7 @@ class JsonStore(InmemoryStore):
                 result = json.load(fd)
             return result
         except Exception as e:
-            log.exception('Something went wrong trying to load the store from %s', self.store_path)
+            log.debug('Something went wrong trying to load the store from %s', self.store_path)
             raise e
 
     def _to_json(self):

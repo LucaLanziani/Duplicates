@@ -14,7 +14,21 @@ class DuplicateExceptions(Exception):
     pass
 
 
-def absolute_path(path):
+def set_analyzed_directory_as_cwd(func):
+    def _decorator(self, *args, **kwargs):
+        cwd = os.getcwd()
+        os.chdir(self._directory)
+        try:
+            return func(self, *args, **kwargs)
+        finally:
+            os.chdir(cwd)
+    return _decorator
+
+
+def absolute_path(directory, filepath=None):
+    path = directory
+    if filepath is not None:
+        path = os.path.join(directory, filepath)
     path = os.path.expanduser(path)
     path = os.path.expandvars(path)
     path = os.path.normpath(path)
@@ -23,7 +37,7 @@ def absolute_path(path):
 
 def relative_path(directory, path):
     abs_directory = absolute_path(directory)
-    abs_path = absolute_path(path)
+    abs_path = absolute_path(abs_directory, path)
     return os.path.relpath(abs_path, abs_directory)
 
 

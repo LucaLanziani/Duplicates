@@ -8,7 +8,8 @@ from duplicates.indexer import Indexer
 from duplicates.store.json_store import FILESTORE
 from nose.tools import assert_true, eq_
 
-TEST_DIR = './test/files/test_dir_1/'
+TEST_DIR = os.path.join(os.path.dirname(__file__), 'files/test_dir_1/')
+
 STORE_PATH = os.path.join(TEST_DIR, FILESTORE)
 
 

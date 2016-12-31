@@ -43,6 +43,6 @@ class UnixShellWildcardsFilter(BaseFilter):
         return self._match(pathname)
 
     def filter_dircontent(self, dircontent):
-        for filepath, directory in dircontent:
+        for directory, filepath in dircontent:
             if self.match(filepath):
-                yield filepath, directory
+                yield directory, filepath

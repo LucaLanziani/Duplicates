@@ -1,6 +1,7 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import os
 import unittest
 
 from duplicates.analyzer import Analyzer
@@ -8,15 +9,15 @@ from duplicates.indexer import Indexer
 from duplicates.store.inmemory_store import InmemoryStore
 from nose.tools import eq_
 
-TEST_DIR_1 = './test/files/test_dir_1'
-TEST_DIR_2 = './test/files/test_dir_2'
+TEST_DIR_1 = os.path.join(os.path.dirname(__file__), 'files/test_dir_1/')
+TEST_DIR_2 = os.path.join(os.path.dirname(__file__), 'files/test_dir_2/')
 
 
 class AnalyzerTest(unittest.TestCase):
 
     def setUp(self):
-        self.first_store = Indexer(TEST_DIR_1, store=InmemoryStore).index()
-        self.second_store = Indexer(TEST_DIR_2, store=InmemoryStore).index()
+        self.first_store = Indexer(TEST_DIR_1, storeCLS=InmemoryStore).index()
+        self.second_store = Indexer(TEST_DIR_2, storeCLS=InmemoryStore).index()
         self.analyzer = Analyzer()
 
     def test_duplicates(self):

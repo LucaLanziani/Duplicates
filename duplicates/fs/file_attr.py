@@ -37,11 +37,11 @@ class FileNotFoundError(DuplicateExceptions):
 
 
 def file_exists(func):
-    def func_wrapper(cls, pathname, *args, **kwargs):
-        abs_pathname = absolute_path(pathname)
+    def func_wrapper(cls, directory, pathname, *args, **kwargs):
+        abs_pathname = absolute_path(directory, pathname)
         if not os.path.exists(abs_pathname):
             raise FileNotFoundError(abs_pathname)
-        return func(cls, pathname, *args, **kwargs)
+        return func(cls, directory, pathname, *args, **kwargs)
     return func_wrapper
 
 
@@ -67,25 +67,25 @@ class FileAttr(object):
 
     @classmethod
     @file_exists
-    def _sha256(cls, pathname):
-        return cls._hash(pathname, hash_function=hashlib.sha256)
+    def _sha256(cls, directory, pathname):
+        return cls._hash(directory, pathname, hash_function=hashlib.sha256)
 
     @classmethod
     @file_exists
-    def _sha1(cls, pathname):
-        return cls._hash(pathname, hash_function=hashlib.sha1)
+    def _sha1(cls, directory, pathname):
+        return cls._hash(directory, pathname, hash_function=hashlib.sha1)
 
     @classmethod
     @file_exists
-    def _md5(cls, pathname):
-        return cls._hash(pathname, hash_function=hashlib.md5)
+    def _md5(cls, directory, pathname):
+        return cls._hash(directory, pathname, hash_function=hashlib.md5)
 
     @classmethod
     @file_exists
-    def _hash(cls, pathname, hash_function=hashlib.md5):
+    def _hash(cls, directory, pathname, hash_function=hashlib.md5):
         log.debug('Hashing %s using %s algorithm', pathname, hash_function.__name__)
         filehash = hash_function()
-        with open(absolute_path(pathname), 'rb') as fp:
+        with open(absolute_path(directory, pathname), 'rb') as fp:
             buf = fp.read(BLOCKSIZE)
             while len(buf) > 0:
                 filehash.update(buf)
@@ -98,42 +98,42 @@ class FileAttr(object):
 
     @classmethod
     @file_exists
-    def _abs_pathname(cls, pathname):
-        return absolute_path(pathname)
+    def _abs_pathname(cls, directory, pathname):
+        return absolute_path(directory, pathname)
 
     @classmethod
-    def _pathname_hash(cls, pathname):
+    def _pathname_hash(cls, directory, pathname):
         assert not os.path.isabs(pathname)
         return cls._hash_string(pathname)
 
     @classmethod
-    def _abs_pathname_hash(cls, pathname):
-        return cls._hash_string(cls._abs_pathname(pathname))
+    def _abs_pathname_hash(cls, directory, pathname):
+        return cls._hash_string(cls._abs_pathname(directory, pathname))
 
     @classmethod
     @file_exists
-    def _directory(cls, pathname):
-        return os.path.dirname(cls._abs_pathname(pathname))
+    def _directory(cls, directory, pathname):
+        return os.path.dirname(cls._abs_pathname(directory, pathname))
 
     @classmethod
     @file_exists
-    def _filename(cls, pathname):
-        return os.path.basename(cls._abs_pathname(pathname))
+    def _filename(cls, directory, pathname):
+        return os.path.basename(cls._abs_pathname(directory, pathname))
 
     @classmethod
     @file_exists
-    def _extension(cls, pathname):
-        return os.path.splitext(cls._abs_pathname(pathname))[1].lower()
+    def _extension(cls, directory, pathname):
+        return os.path.splitext(cls._abs_pathname(directory, pathname))[1].lower()
 
     @classmethod
     @file_exists
-    def _size(cls, pathname):
-        return os.stat(cls._abs_pathname(pathname))[stat.ST_SIZE]
+    def _size(cls, directory, pathname):
+        return os.stat(cls._abs_pathname(directory, pathname))[stat.ST_SIZE]
 
     @classmethod
     @file_exists
-    def _lmtime(cls, pathname):
-        return os.stat(cls._abs_pathname(pathname))[stat.ST_MTIME]
+    def _lmtime(cls, directory, pathname):
+        return os.stat(cls._abs_pathname(directory, pathname))[stat.ST_MTIME]
 
     @classmethod
     def pathname_hash(cls, *args, **kwdargs):
@@ -141,21 +141,22 @@ class FileAttr(object):
 
     @classmethod
     @file_exists
-    def get(cls, pathname, directory, attributes=()):
+    def get(cls, directory, filepath, attributes=()):
+        assert os.path.isdir(directory)
         attrs_to_method = cls._attr_to_method()
         attrs = set(attrs_to_method.keys()).intersection(attributes)
-        rel_pathname = relative_path(directory, pathname)
+        rel_pathname = relative_path(directory, filepath)
         result = {
             Attributes.ROOTDIR: absolute_path(directory),
             Attributes.PATHNAME: rel_pathname
         }
         for attr in attrs:
-            result[attr] = attrs_to_method[attr](rel_pathname)
+            result[attr] = attrs_to_method[attr](absolute_path(directory), rel_pathname)
         return result
 
     @classmethod
     def attr_generator(cls, dircontent, attributes=None):
         if attributes is None:
             attributes = cls._attr_to_method().keys()
-        for pathname, rootDir in dircontent:
-            yield cls.get(pathname, rootDir, attributes=attributes)
+        for rootDir, filepath in dircontent:
+            yield cls.get(rootDir, filepath, attributes=attributes)

@@ -10,7 +10,7 @@ from duplicates.fs.directory import Directory
 from duplicates.fs.file_attr import Attributes, FileAttr
 from duplicates.libraries.filters import UnixShellWildcardsFilter
 from duplicates.libraries.output import DummyOutput
-from duplicates.libraries.utils import DuplicateExceptions, set_analyzed_directory_as_cwd
+from duplicates.libraries.utils import DuplicateExceptions
 from duplicates.store.json_store import InmemoryStore
 
 ATTRIBUTES = set([Attributes.HASH, Attributes.SIZE, Attributes.LMTIME, Attributes.PATHNAME_HASH])
@@ -108,7 +108,6 @@ class Explorer(object):
         for pathname, _ in self._filtered_content():
             yield pathname
 
-    @set_analyzed_directory_as_cwd
     def list(self):
         log.info('Listing %s content with %s filter', self._directory, self._store.filters)
         self._count_files()

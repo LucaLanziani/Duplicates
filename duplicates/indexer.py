@@ -7,7 +7,6 @@ import logging
 import os
 
 from duplicates.fs.explorer import Explorer
-from duplicates.libraries.utils import set_analyzed_directory_as_cwd
 from duplicates.store.json_store import JsonStore
 
 
@@ -21,7 +20,6 @@ class Indexer(Explorer):
             storeCLS = JsonStore
         super(Indexer, self).__init__(directory, output, unix_patterns, storeCLS)
 
-    @set_analyzed_directory_as_cwd
     def index(self):
         for attrs in self._getattributes():
             self._store.add_file(attrs)

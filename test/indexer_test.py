@@ -6,6 +6,7 @@ import unittest
 
 from duplicates.fs.explorer import FilterMismatchException, FilterNotFoundException
 from duplicates.indexer import Indexer
+from duplicates.libraries.utils import epoch, serialize_date
 from duplicates.store.json_store import FILESTORE
 from nose.tools import assert_true, eq_, raises
 
@@ -54,6 +55,17 @@ class IndexerTest(unittest.TestCase):
         indexer.run()
         indexer = Indexer(TEST_DIR, unix_patterns=['*.jpg', '*.test'])
         indexer.run()
+
+    def test_last_update(self):
+        indexer = Indexer(TEST_DIR, unix_patterns=['*.jpg', '*.test'])
+        store = indexer.index()
+        assert store.last_update != serialize_date(epoch)
+
+    def test_timestamp_update_only_if_index_is_updated(self):
+        indexer = Indexer(TEST_DIR, unix_patterns=['*.jpg', '*.test'])
+        update_time = indexer.index().last_update
+        not_updated = indexer.index().last_update
+        assert update_time == not_updated, "%r != %r" % (update_time, not_updated)
 
     def test_store(self):
         self.indexer.run()

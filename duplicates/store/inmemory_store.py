@@ -2,6 +2,7 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import datetime
 import logging
 import os
 
@@ -23,6 +24,13 @@ PATHNAME = 'pathname'
 LAST_UPDATE = 'updated'
 
 log = logging.getLogger(__name__)
+
+
+def updated(func):
+    def func_wrapper(self, *args, **kwargs):
+        self._set_last_update()
+        return func(self, *args, **kwargs)
+    return func_wrapper
 
 
 class InmemoryStore(DummyStore):
@@ -67,6 +75,7 @@ class InmemoryStore(DummyStore):
         log.debug('Absolute pathname for %s: %s', local_pathname, abs_pathname)
         return abs_pathname
 
+    @updated
     def _add_file(self, file_attr):
         file_attr = Munch(file_attr)
         pathname = file_attr.pathname
@@ -83,6 +92,7 @@ class InmemoryStore(DummyStore):
         log.debug('Adding %s to the store', pathname)
         self._known_pathnames_hashes.add(pathname_hash)
 
+    @updated
     def _remove_pathname(self, pathname):
         log.debug('Removing %s from the store', pathname)
         pathname_hash = FileAttr.pathname_hash(pathname)
@@ -121,6 +131,7 @@ class InmemoryStore(DummyStore):
         return self._data[FILTERS]
 
     @filters.setter
+    @updated
     def filters(self, filters):
         self._data[FILTERS] = filters
 
@@ -133,6 +144,9 @@ class InmemoryStore(DummyStore):
 
     def hash_to_abs_pathnames(self, hash):
         return map(self._absolute_pathname, self.hash_to_pathnames[hash])
+
+    def _set_last_update(self):
+        self._data[LAST_UPDATE] = serialize_date(datetime.datetime.utcnow())
 
     def __repr__(self):
         return repr(self._data)
@@ -153,5 +167,5 @@ class InmemoryStore(DummyStore):
         return self._data[FILE_HASH_TO_PATHNAMES]
 
     @property
-    def _last_update(self):
+    def last_update(self):
         return self._data[LAST_UPDATE]

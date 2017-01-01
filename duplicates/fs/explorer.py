@@ -32,7 +32,7 @@ class FilterMismatchException(DuplicateExceptions):
 class Explorer(object):
 
     def __init__(self, directory, output=None, unix_patterns=None, storeCLS=None):
-        self._directory = os.path.abspath(directory)
+        self._directory = os.path.abspath(os.path.expanduser(directory))
         self._settings(output, storeCLS)
         self._pathname_sha_cache = {}
         self._load_store_content()

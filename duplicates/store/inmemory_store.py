@@ -54,7 +54,7 @@ class InmemoryStore(DummyStore):
             PATHNAME_HASH_TO_ATTRS: {},
             FILE_HASH_TO_PATHNAMES: {},
             LAST_UPDATE: serialize_date(epoch),
-            FILTERS: '*'
+            FILTERS: None
         }
         super(InmemoryStore, self).__init__(default_data)
         self._base_dir = directory

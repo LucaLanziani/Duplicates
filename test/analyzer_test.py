@@ -16,8 +16,8 @@ TEST_DIR_2 = os.path.join(os.path.dirname(__file__), 'files/test_dir_2/')
 class AnalyzerTest(unittest.TestCase):
 
     def setUp(self):
-        self.first_store = Indexer(TEST_DIR_1, storeCLS=InmemoryStore).index()
-        self.second_store = Indexer(TEST_DIR_2, storeCLS=InmemoryStore).index()
+        self.first_store = Indexer(TEST_DIR_1, unix_patterns="*", storeCLS=InmemoryStore).index()
+        self.second_store = Indexer(TEST_DIR_2, unix_patterns="*", storeCLS=InmemoryStore).index()
         self.analyzer = Analyzer()
 
     def test_duplicates(self):

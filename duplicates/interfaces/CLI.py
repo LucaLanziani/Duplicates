@@ -37,7 +37,8 @@ class CommandLineInterface(object):
         --log-level=<LEVEL>         process debug level [default: INFO]
 
     Examples:
-        %(name)s .                  # every file
+        %(name)s .                  # uses the filters in the store
+        %(name)s . '*'              # every file
         %(name)s . '*.png'          # only .png files
         %(name)s . '*.png' '*.jpg'  # .png and .jpg files
     """

@@ -13,7 +13,7 @@ TEST_DIR = os.path.join(os.path.dirname(__file__), 'files/test_dir_1/')
 class IndexerTest(unittest.TestCase):
 
     def setUp(self):
-        self.explorer = Explorer(TEST_DIR)
+        self.explorer = Explorer(TEST_DIR, unix_patterns="*")
 
     def test_list_length(self):
         result = self.explorer.list()

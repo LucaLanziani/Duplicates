@@ -45,6 +45,12 @@ class Explorer(object):
             log.debug("No existing store in directory %s", self._directory)
 
     def _set_filters(self, unix_patterns):
+        if self._store.filters is None and not unix_patterns:
+            raise FilterNotFoundException('You need to specify a filter the first time you index a directory')
+
+        if unix_patterns and self._store.filters and (unix_patterns != self._store.filters):
+            raise FilterMismatchException('Filters are already defined here %s' % self._store.filters)
+
         if not unix_patterns:
             unix_patterns = self._store.filters
 

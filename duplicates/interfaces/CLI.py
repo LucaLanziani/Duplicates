@@ -82,13 +82,13 @@ class CommandLineInterface(object):
         )
 
         if opt['--purge']:
-            indexer.purge()
+            indexer.purge().save()
 
         if opt['--index']:
             indexer.run(not opt['--no-store'])
 
     def _analyze(self, opt):
-        store = Indexer(
+        index1 = Indexer(
             opt['DIRECTORY'],
             unix_patterns=opt['PATTERNS']
         ).index()
@@ -96,24 +96,24 @@ class CommandLineInterface(object):
         analyzer = Analyzer(output=ConsoleOutput(True, False))
 
         if opt['--intersection']:
-            second_store = Indexer(
+            index2 = Indexer(
                 opt['--intersection'],
                 unix_patterns=opt['PATTERNS']
             ).index()
-            results = analyzer.intersection(store, second_store)
+            results = analyzer.intersection(index1, index2)
             for tuple in results:
                 self.output.print("%s -> %s" % (tuple[0], tuple[1]))
 
         if opt['--difference']:
-            second_store = Indexer(
+            index2 = Indexer(
                 opt['--difference'],
                 unix_patterns=opt['PATTERNS']
             ).index()
-            results = analyzer.difference(store, second_store)
+            results = analyzer.difference(index1, index2)
             self.output.print("%s" % '\n'.join(results))
 
         if opt['--duplicates']:
-            for duplicates in analyzer.duplicates(store):
+            for duplicates in analyzer.duplicates(index1):
                 self.output.print("\t".join(duplicates))
 
     def run(self, name=None):

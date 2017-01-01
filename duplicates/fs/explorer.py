@@ -115,3 +115,7 @@ class Explorer(object):
         filtered_content = self._filtered_content()
         for content in filtered_content:
             yield content
+
+    @property
+    def directory(self):
+        return self._directory

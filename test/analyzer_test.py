@@ -16,20 +16,18 @@ TEST_DIR_2 = os.path.join(os.path.dirname(__file__), 'files/test_dir_2/')
 class AnalyzerTest(unittest.TestCase):
 
     def setUp(self):
-        self.first_store = Indexer(TEST_DIR_1, unix_patterns="*", storeCLS=InmemoryStore).index()
-        self.second_store = Indexer(TEST_DIR_2, unix_patterns="*", storeCLS=InmemoryStore).index()
+        self.first_index = Indexer(TEST_DIR_1, unix_patterns="*", storeCLS=InmemoryStore).index()
+        self.second_index = Indexer(TEST_DIR_2, unix_patterns="*", storeCLS=InmemoryStore).index()
         self.analyzer = Analyzer()
 
     def test_duplicates(self):
-        duplicates = list(self.analyzer.duplicates(self.first_store))
+        duplicates = list(self.analyzer.duplicates(self.first_index))
         eq_(len(duplicates), 1)
 
     def test_intersection(self):
-        intersection = self.analyzer.intersection(self.first_store, self.second_store)
-        print(intersection)
+        intersection = self.analyzer.intersection(self.first_index, self.second_index)
         eq_(len(intersection), 2)
 
     def test_difference(self):
-        difference = self.analyzer.difference(self.second_store, self.first_store)
-        print(difference)
+        difference = self.analyzer.difference(self.second_index, self.first_index)
         eq_(len(difference), 1)

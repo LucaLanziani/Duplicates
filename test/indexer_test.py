@@ -41,7 +41,7 @@ class IndexerTest(unittest.TestCase):
 
     def test_double_run(self):
         indexer = Indexer(TEST_DIR, unix_patterns=['*.jpg', '*.test'])
-        indexer.run(store=False)
+        indexer.run(persist=False)
         result = indexer.index()
         eq_(len(result), 2)
 
@@ -57,9 +57,9 @@ class IndexerTest(unittest.TestCase):
         indexer.run()
 
     def test_last_update(self):
-        indexer = Indexer(TEST_DIR, unix_patterns=['*.jpg', '*.test'])
-        store = indexer.index()
-        assert store.last_update != serialize_date(epoch)
+        index = Indexer(TEST_DIR, unix_patterns=['*.jpg', '*.test'])
+        index = index.index()
+        assert index.last_update != serialize_date(epoch)
 
     def test_timestamp_update_only_if_index_is_updated(self):
         indexer = Indexer(TEST_DIR, unix_patterns=['*.jpg', '*.test'])

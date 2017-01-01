@@ -76,15 +76,16 @@ class Explorer(object):
         self._filtered = 0
         for directory, filepath in Directory.content(self._directory):
             self._total_files += 1
-            if (self._valid_pathname(filepath)):
+            if (self._valid_pathname(directory, filepath)):
                 self._filtered += 1
 
-    def _valid_pathname(self, pathname):
+    def _valid_pathname(self, directory, filepath):
+        pathname = os.path.join(directory, filepath)
         return (
             pathname != self._store.store_path and
             os.path.isfile(pathname) and
             (not self._unixpatterns_filter.enabled or
-                self._unixpatterns_filter.match(pathname))
+                self._unixpatterns_filter.match(filepath))
         )
 
     def _getattributes(self):

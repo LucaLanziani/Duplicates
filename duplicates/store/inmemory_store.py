@@ -65,13 +65,13 @@ class InmemoryStore(DummyStore):
             FILTERS: None
         }
         super(InmemoryStore, self).__init__(default_data)
-        self._base_dir = directory
+        self._directory = directory
 
     def _local_path(self, abs_pathname):
-        return abs_pathname.replace(self._base_dir, '.')
+        return abs_pathname.replace(self._directory, '.')
 
     def _absolute_pathname(self, local_pathname):
-        abs_pathname = os.path.normpath(os.path.join(self._base_dir, local_pathname))
+        abs_pathname = os.path.normpath(os.path.join(self._directory, local_pathname))
         log.debug('Absolute pathname for %s: %s', local_pathname, abs_pathname)
         return abs_pathname
 
@@ -94,8 +94,8 @@ class InmemoryStore(DummyStore):
 
     @updated
     def _remove_pathname(self, pathname):
-        log.debug('Removing %s from the store', pathname)
-        pathname_hash = FileAttr.pathname_hash(pathname)
+        log.debug('Removing %s from the store', os.path.join(self._directory, pathname))
+        pathname_hash = FileAttr.pathname_hash(self._directory, pathname)
         self._known_pathnames_hashes.remove(pathname_hash)
         stored_data = self._pathname_hash_to_attr[pathname_hash]
         self.hash_to_pathnames[stored_data[HASH]].remove(stored_data[PATHNAME])
@@ -134,6 +134,9 @@ class InmemoryStore(DummyStore):
     @updated
     def filters(self, filters):
         self._data[FILTERS] = filters
+
+    def clean(self):
+        self._data[FILE_HASH_TO_PATHNAMES] = {k: v for k, v in self.hash_to_pathnames.iteritems() if v}
 
     def remove_pathname(self, pathname):
         self._remove_pathname(pathname)

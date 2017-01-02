@@ -31,10 +31,11 @@ class Indexer(Explorer):
         return self
 
     def purge(self):
-        for hash, paths in self._store.paths_by_hash():
+        for hash, paths in self._store.relpaths_by_hash():
             for path in paths:
-                if not os.path.isfile(path):
+                if not os.path.isfile(os.path.join(self.directory, path)):
                     self._store.remove_pathname(path)
+        self._store.clean()
         return self
 
     def run(self, persist=True):

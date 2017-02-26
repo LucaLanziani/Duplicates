@@ -40,7 +40,7 @@ def file_exists(func):
     def func_wrapper(cls, directory, pathname, *args, **kwargs):
         abs_pathname = absolute_path(directory, pathname)
         if not os.path.exists(abs_pathname):
-            raise FileNotFoundError(abs_pathname)
+            raise FileNotFoundError('Cannot find %s' % abs_pathname)
         return func(cls, directory, pathname, *args, **kwargs)
     return func_wrapper
 
@@ -90,6 +90,7 @@ class FileAttr(object):
             while len(buf) > 0:
                 filehash.update(buf)
                 buf = fp.read(BLOCKSIZE)
+        log.debug('result: %s', filehash.hexdigest())
         return filehash.hexdigest()
 
     @classmethod

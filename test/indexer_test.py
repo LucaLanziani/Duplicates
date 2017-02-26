@@ -12,6 +12,7 @@ from nose.tools import assert_true, eq_, raises
 
 
 TEST_DIR = os.path.join(os.path.dirname(__file__), 'files/test_dir_1/')
+TEST_DIR_2 = os.path.join(os.path.dirname(__file__), 'files/test_dir_2/')
 
 STORE_PATH = os.path.join(TEST_DIR, FILESTORE)
 
@@ -66,6 +67,16 @@ class IndexerTest(unittest.TestCase):
         update_time = indexer.index().last_update
         not_updated = indexer.index().last_update
         assert update_time == not_updated, "%r != %r" % (update_time, not_updated)
+
+    def test_find_index_on_jpg_search_non_jpg(self):
+        index = Indexer(TEST_DIR, unix_patterns=['*.jpg']).index()
+        results = index.find(os.path.join(TEST_DIR_2, 'testfile_10MB'))
+        eq_(results, None)
+
+    def test_find_index_all(self):
+        index = Indexer(TEST_DIR, unix_patterns=['*']).index()
+        results = index.find(os.path.join(TEST_DIR_2, 'testfile_10MB'))
+        eq_(results, [os.path.join(TEST_DIR, 'sub_folder/testfile_10MB')])
 
     def test_store(self):
         self.indexer.run()

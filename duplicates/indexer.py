@@ -6,7 +6,8 @@ from __future__ import (absolute_import, division, print_function,
 import logging
 import os
 
-from duplicates.fs.explorer import Explorer
+from duplicates.fs.explorer import Attributes, Explorer, FileAttr
+from duplicates.libraries.utils import absolute_path
 from duplicates.store.json_store import JsonStore
 
 
@@ -59,5 +60,17 @@ class Indexer(Explorer):
         return self._store.last_update
 
     @property
-    def paths_by_hash(self):
-        return self._store.paths_by_hash()
+    def relpaths_by_hash(self):
+        return self._store.relpaths_by_hash()
+
+    @property
+    def filters(self):
+        return self._store.filters
+
+    def find(self, pathname):
+        filepath = absolute_path(pathname)
+        directory = os.path.dirname(filepath)
+        filename = os.path.basename(filepath)
+        attributes = set([Attributes.HASH])
+        file_attr = FileAttr.get(directory, filename, attributes=attributes)
+        return self._store.hash_to_abs_pathnames(file_attr[Attributes.HASH])

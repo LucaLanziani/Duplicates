@@ -29,5 +29,5 @@ class AnalyzerTest(unittest.TestCase):
         eq_(len(intersection), 2)
 
     def test_difference(self):
-        difference = self.analyzer.difference(self.second_index, self.first_index)
+        difference = self.analyzer.difference(self.first_index, self.second_index)
         eq_(len(difference), 1)

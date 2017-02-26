@@ -33,7 +33,8 @@ class CommandLineInterface(object):
         --progress                  print progress update in console
         --no-store                  do not save the gathered information on filesystem
         --intersection=<DIRECTORY>  show the common files between the two directories
-        --difference=<DIRECTORY>    show the files in the current dir that are not in the given dir
+        --difference=<NEWDIR>       show the files in NEWDIR that are not in DIRECTORY
+        --find=<file>               find same files in DIRECTORY
         --log-level=<LEVEL>         process debug level [default: INFO]
 
     Examples:
@@ -56,6 +57,7 @@ class CommandLineInterface(object):
             Optional('--duplicates'): bool,
             Optional('--progress'): bool,
             Optional('--no-store'): bool,
+            Optional('--find'): Or(unicode, str, None),
             Optional('--intersection'): Or(unicode, str, None),
             Optional('--difference'): Or(unicode, str, None),
             Optional('--log-level'): Or(unicode, str),
@@ -91,14 +93,15 @@ class CommandLineInterface(object):
         index1 = Indexer(
             opt['DIRECTORY'],
             unix_patterns=opt['PATTERNS']
-        ).index()
-
+        )
+        log.warning('Last update on index was %s' % index1.last_update)
+        log.warning('if you want an updated result add --index option')
         analyzer = Analyzer(output=ConsoleOutput(True, False))
 
         if opt['--intersection']:
             index2 = Indexer(
                 opt['--intersection'],
-                unix_patterns=opt['PATTERNS']
+                unix_patterns=index1.filters
             ).index()
             results = analyzer.intersection(index1, index2)
             for tuple in results:
@@ -107,10 +110,17 @@ class CommandLineInterface(object):
         if opt['--difference']:
             index2 = Indexer(
                 opt['--difference'],
-                unix_patterns=opt['PATTERNS']
+                unix_patterns=index1.filters
             ).index()
             results = analyzer.difference(index1, index2)
             self.output.print("%s" % '\n'.join(results))
+
+        if opt['--find']:
+            results = index1.find(opt['--find'])
+            if results:
+                self.output.print("%s" % '\n'.join(results))
+            else:
+                self.output.print('File not found')
 
         if opt['--duplicates']:
             for duplicates in analyzer.duplicates(index1):
@@ -124,7 +134,7 @@ class CommandLineInterface(object):
             if opt['--index'] or opt['--purge']:
                 self._on_index(opt)
 
-            if opt['--intersection'] or opt['--difference'] or opt['--duplicates']:
+            if opt['--intersection'] or opt['--difference'] or opt['--duplicates'] or opt['--find']:
                 self._analyze(opt)
 
         except KeyboardInterrupt:

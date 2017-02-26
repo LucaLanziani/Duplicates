@@ -56,6 +56,7 @@ class Explorer(object):
 
         self._store.filters = unix_patterns
         self._unixpatterns_filter = UnixShellWildcardsFilter(*self._store.filters)
+        log.warning('The index contains only files matching %s' % self._store.filters)
 
     def _settings(self, output, storeCLS):
         if storeCLS is None:

@@ -7,13 +7,16 @@ import unittest
 from duplicates.fs.explorer import Explorer
 from nose.tools import eq_
 
-TEST_DIR = os.path.join(os.path.dirname(__file__), 'files/test_dir_1/')
+TEST_DIR = os.path.join(os.path.dirname(__file__), 'files/test_dir_1')
 
 
 class IndexerTest(unittest.TestCase):
 
     def setUp(self):
         self.explorer = Explorer(TEST_DIR, unix_patterns="*")
+
+    def test_get_directory(self):
+        eq_(self.explorer.directory, TEST_DIR)
 
     def test_list_length(self):
         result = self.explorer.list()

@@ -61,7 +61,7 @@ class JsonStore(InmemoryStore):
     def _to_json(self):
         try:
             self._data[KNOWN_PATHNAMES_HASHES] = list(self._known_pathnames_hashes)
-            with gzip.open(self.store_path, 'wb') as fd:
+            with gzip.open(self.store_path, mode='wb') as fd:
                 json.dump(self._data, fd, indent=4)
         except Exception as e:
             log.exception('Something went wrong trying to persist the store to %s', self.store_path)

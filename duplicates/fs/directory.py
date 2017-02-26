@@ -3,6 +3,7 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import os
+from builtins import str as text
 
 from duplicates.libraries.utils import absolute_path, DuplicateExceptions
 
@@ -45,7 +46,7 @@ class Directory(object):
     @classmethod
     @dir_exists
     def _content(cls, directory, recursive=True):
-        for root, dirs, files in os.walk(unicode(directory)):
+        for root, dirs, files in os.walk(text(directory)):
             for name in files:
                 yield os.path.join(root, name)
             if not recursive:

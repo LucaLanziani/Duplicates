@@ -18,7 +18,7 @@ class Analyzer(object):
             self.output = DummyOutput()
 
     def duplicates(self, index):
-        for _, duplicates in index.paths_by_hash:
+        for _, duplicates in index.relpaths_by_hash:
             if len(duplicates) > 1:
                 yield duplicates
 
@@ -32,6 +32,6 @@ class Analyzer(object):
     def difference(self, main_index, secondary_index):
         main_index_hashes = main_index.files_hashes
         secondary_index_hashes = secondary_index.files_hashes
-        difference = main_index_hashes.difference(secondary_index_hashes)
-        list_of_list_of_paths = map(main_index.abs_pathnames_from_hash, difference)
+        difference = secondary_index_hashes.difference(main_index_hashes)
+        list_of_list_of_paths = map(secondary_index.abs_pathnames_from_hash, difference)
         return [path for list_of_paths in list_of_list_of_paths for path in list_of_paths]

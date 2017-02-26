@@ -7,8 +7,9 @@ import logging
 import os
 
 from duplicates.fs.file_attr import Attributes, FileAttr
-from duplicates.libraries.utils import (epoch, serialize_date)
+from duplicates.libraries.utils import (absolute_path, epoch, serialize_date)
 from duplicates.store.dummy_store import DummyStore
+from future.utils import viewitems
 
 from munch import Munch
 
@@ -136,17 +137,18 @@ class InmemoryStore(DummyStore):
         self._data[FILTERS] = filters
 
     def clean(self):
-        self._data[FILE_HASH_TO_PATHNAMES] = {k: v for k, v in self.hash_to_pathnames.iteritems() if v}
+        self._data[FILE_HASH_TO_PATHNAMES] = {k: v for k, v in viewitems(self.hash_to_pathnames) if v}
 
     def remove_pathname(self, pathname):
         self._remove_pathname(pathname)
 
-    def paths_by_hash(self):
-        for hash, paths in self.hash_to_pathnames.iteritems():
+    def relpaths_by_hash(self):
+        for hash, paths in viewitems(self.hash_to_pathnames):
             yield hash, paths
 
     def hash_to_abs_pathnames(self, hash):
-        return map(self._absolute_pathname, self.hash_to_pathnames[hash])
+        if hash in self.hash_to_pathnames:
+            return map(self._absolute_pathname, self.hash_to_pathnames[hash])
 
     def _set_last_update(self):
         self._data[LAST_UPDATE] = serialize_date(datetime.datetime.utcnow())
